@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Compiler Optimization Lab</title>
+    <meta name="description" content="Apple-designed experimental compiler benchmarking platform comparing traditional LLVM and LLM-assisted optimization passes." />
+    <meta property="og:title" content="Compiler Optimization Lab" />
+    <meta property="og:description" content="Apple-designed experimental compiler benchmarking platform comparing traditional LLVM and LLM-assisted optimization passes." />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=SF+Pro+Display:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+      // Suppress benign iframe WebSocket reconnection errors in cloud preview
+      window.addEventListener('unhandledrejection', function(e) {
+        if (e && e.reason && typeof e.reason.message === 'string') {
+          if (e.reason.message.includes('WebSocket') || e.reason.message.includes('ws')) {
+            e.preventDefault();
+          }
+        }
+      });
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
+

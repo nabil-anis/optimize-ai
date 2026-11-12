@@ -1,0 +1,6 @@
+{
+  "name": "Compiler Optimization Lab",
+  "description": "Apple-designed experimental compiler benchmarking platform comparing traditional LLVM and LLM-assisted optimization passes.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

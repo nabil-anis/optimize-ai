@@ -1,0 +1,123 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --bg-main: #F5F5F7; /* Apple signature porcelain white */
+    --surface-glass: #FFFFFF;
+    --surface-border: rgba(0, 0, 0, 0.08);
+    --text-primary: #1D1D1F;
+    --text-secondary: #6E6E73;
+    --accent-titanium: #E5E5EA;
+    --accent-contrast: #000000;
+  }
+
+  .dark {
+    --bg-main: #000000; /* Pure deep OLED black */
+    --surface-glass: rgba(18, 18, 20, 0.85);
+    --surface-border: rgba(255, 255, 255, 0.08);
+    --text-primary: #F5F5F7;
+    --text-secondary: #A1A1AA;
+    --accent-titanium: #1C1C1E;
+    --accent-contrast: #FFFFFF;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background-color: var(--bg-main);
+    color: var(--text-primary);
+  }
+
+  code, pre, .font-mono {
+    font-family: "SF Mono", "JetBrains Mono", ui-monospace, Menlo, Monaco, Consolas, monospace;
+  }
+}
+
+/* Apple-style frosted surfaces */
+.apple-glass {
+  background: #FFFFFF;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.03);
+}
+
+.dark .apple-glass {
+  background: rgba(18, 18, 20, 0.78);
+  backdrop-filter: blur(28px) saturate(180%);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+}
+
+.apple-glass-pill {
+  background: rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.dark .apple-glass-pill {
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Well / Secondary container */
+.apple-well {
+  background: #F8F8FA;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.dark .apple-well {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* Code container */
+.apple-code-box {
+  background: #F5F5F7;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  color: #1D1D1F;
+}
+
+.dark .apple-code-box {
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #E8E9EC;
+}
+
+/* 3D Flip Card Preservation */
+.perspective-1200 {
+  perspective: 1200px;
+}
+
+.preserve-3d {
+  transform-style: preserve-3d;
+}
+
+.backface-hidden {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.rotate-y-180 {
+  transform: rotateY(180deg);
+}
+
+/* Subtle Apple minimalist scrollbar */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(140, 140, 145, 0.3);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(140, 140, 145, 0.5);
+}
