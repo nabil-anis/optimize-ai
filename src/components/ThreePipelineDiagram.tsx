@@ -6,20 +6,14 @@ import {
   Play,
   Pause,
   RotateCcw,
-  Sparkles,
-  Cpu,
-  Terminal,
-  Activity,
-  Layers,
-  CheckCircle2,
   X,
-  Eye,
-  Info
+  ArrowDown
 } from 'lucide-react';
 import { BenchmarkResponse } from '../types';
 
 interface StageMeta {
   id: string;
+  shortLabel: string;
   name: string;
   phaseNumber: number | string;
   category: string;
@@ -32,19 +26,21 @@ interface StageMeta {
 const COMPILER_STAGES: Record<string, StageMeta> = {
   'source': {
     id: 'source',
-    name: 'Source Code Input',
-    phaseNumber: 'Input',
-    category: 'Source Code',
-    summary: 'Your original C or C++ algorithm before any compiler translation begins.',
+    shortLabel: 'START: Source Code',
+    name: 'START: Source Code Input',
+    phaseNumber: 'START',
+    category: 'Beginning of Pipeline',
+    summary: 'Your original C or C++ algorithm enters at the top of the compiler.',
     role: 'Provides the raw text for analysis.',
     traditionalDetail: 'Standard C/C++ source code file.',
     aiDetail: 'Identical input ensures a 100% fair benchmark race.',
   },
   'lexical': {
     id: 'lexical',
+    shortLabel: '1. Lexical (Scanner)',
     name: '1. Lexical Analysis (Scanner)',
     phaseNumber: 1,
-    category: 'Word Scanning',
+    category: 'Phase 1 • Word Scanning',
     summary: 'Reads characters and groups them into meaningful words like variable names, numbers, and math symbols.',
     role: 'Ignores comments and blank spaces to isolate individual code words.',
     traditionalDetail: 'Scans text into a stream of words.',
@@ -52,9 +48,10 @@ const COMPILER_STAGES: Record<string, StageMeta> = {
   },
   'syntax': {
     id: 'syntax',
+    shortLabel: '2. Syntax (Parser)',
     name: '2. Syntax Analysis (Parser)',
     phaseNumber: 2,
-    category: 'Structure Tree',
+    category: 'Phase 2 • Structure Tree',
     summary: 'Checks that the code follows grammar rules and organizes it into a tree of loops, conditions, and math.',
     role: 'Builds the logical outline of the program.',
     traditionalDetail: 'Builds the standard program outline.',
@@ -62,29 +59,32 @@ const COMPILER_STAGES: Record<string, StageMeta> = {
   },
   'semantic': {
     id: 'semantic',
+    shortLabel: '3. Semantic Analysis',
     name: '3. Semantic Analysis',
     phaseNumber: 3,
-    category: 'Type Safety',
-    summary: 'Makes sure operations make sense (for example, ensuring you do not try to multiply text by a number).',
+    category: 'Phase 3 • Type Safety',
+    summary: 'Makes sure operations make sense (for example, ensuring you do not multiply text by a number).',
     role: 'Verifies data types and links every variable to the Variable Table.',
     traditionalDetail: 'Confirms every variable and type is valid.',
     aiDetail: 'Guarantees the program is safe before optimizing.',
   },
   'intermediate': {
     id: 'intermediate',
+    shortLabel: '4. Intermediate Code',
     name: '4. Intermediate Code Generation',
     phaseNumber: 4,
-    category: 'Universal Blueprint',
+    category: 'Phase 4 • Universal Blueprint',
     summary: 'Turns the code into a clean, step-by-step internal blueprint that works on any type of computer.',
-    role: 'Exposes loops and repeated math so they can be sped up.',
+    role: 'Exposes loops and repeated math before splitting into the two optimization paths.',
     traditionalDetail: 'Creates the starting blueprint.',
     aiDetail: 'Creates a clean blueprint for the AI to inspect.',
   },
   'opt-traditional': {
     id: 'opt-traditional',
+    shortLabel: '5A. Normal Opt (-O2)',
     name: '5A. Code Optimization (-O2)',
     phaseNumber: '5A',
-    category: 'Blind 120+ Checks',
+    category: 'Left Branch • Blind 120+ Checks',
     summary: 'Runs a rigid, fixed checklist of ~120 cleanup rules blindly whether the code needs them or not.',
     role: 'Applies every general-purpose rule in sequence.',
     traditionalDetail: 'Runs ~120 checks every time, wasting time on rules that find nothing.',
@@ -92,55 +92,134 @@ const COMPILER_STAGES: Record<string, StageMeta> = {
   },
   'opt-ai': {
     id: 'opt-ai',
+    shortLabel: '5B. AI Optimization',
     name: '5B. Code Optimization (AI-Guided)',
     phaseNumber: '5B',
-    category: 'Smart AI Selection',
-    summary: 'AI spots the slow parts (like nested math loops) and picks only the 7 exact speedup tools this program needs.',
+    category: 'Right Branch • Smart Selection',
+    summary: 'AI spots the slow parts (like nested loops) and picks only the 5 to 7 exact speedup tools this program needs.',
     role: 'Skips ~113 useless checks and focuses directly on the real bottlenecks.',
     traditionalDetail: 'Replaces blind checklists with targeted diagnosis.',
     aiDetail: 'Cuts optimization time while keeping the app running at top speed.',
   },
   'codegen': {
     id: 'codegen',
+    shortLabel: '6. Target Code Gen',
     name: '6. Target Code Generation',
     phaseNumber: 6,
-    category: 'Machine Translation',
+    category: 'Phase 6 • Machine Translation',
     summary: 'Translates the finished blueprint into direct instructions that your computer processor can run.',
-    role: 'Maps data to fast processor slots and generates machine code.',
+    role: 'Maps data to fast processor registers and emits executable code.',
     traditionalDetail: 'Standard translation to processor instructions.',
     aiDetail: 'Cleaner blueprint makes final translation smoother.',
   },
   'machine': {
     id: 'machine',
-    name: 'Final Runnable Program',
-    phaseNumber: 'Output',
-    category: 'Runnable App',
-    summary: 'The finished program ready to run and time side by side.',
+    shortLabel: 'END: Final Program',
+    name: 'END: Final Runnable Program',
+    phaseNumber: 'END',
+    category: 'End of Pipeline',
+    summary: 'The finished runnable program exits at the bottom of the pipeline ready to be timed side by side.',
     role: 'Runs multiple times to measure speed and confirm identical output.',
     traditionalDetail: 'Standard compiled program.',
     aiDetail: 'AI-optimized program.',
   },
   'symbol-table': {
     id: 'symbol-table',
-    name: 'Variable Table',
-    phaseNumber: 'Lookup',
-    category: 'Central Phonebook',
-    summary: 'A central lookup table tracking every variable name, memory location, and data type across all steps.',
-    role: 'Connected to all 6 steps for instant variable lookups.',
+    shortLabel: 'Variable Table',
+    name: 'Variable Table (Symbol Table)',
+    phaseNumber: 'LEFT',
+    category: 'Connected Across Phases 1–6',
+    summary: 'A central lookup table on the left tracking every variable name, memory location, and type across all 6 steps.',
+    role: 'Connected to all 6 phases via horizontal lookup lines.',
     traditionalDetail: 'Tracks every variable name and scope.',
     aiDetail: 'Helps confirm variable usage stays accurate.',
   },
   'error-handling': {
     id: 'error-handling',
+    shortLabel: 'Error Checker',
     name: 'Error Checker & Safety',
-    phaseNumber: 'Guard',
-    category: 'Safety Guard',
-    summary: 'Watches every step to catch typos, grammar mistakes, and unsafe code before anything runs.',
-    role: 'Reports clear errors and stops broken code from running.',
+    phaseNumber: 'RIGHT',
+    category: 'Connected Across Phases 1–6',
+    summary: 'Monitors every phase from the right side to catch typos, grammar mistakes, and unsafe operations.',
+    role: 'Connected to all 6 phases so errors are caught immediately.',
     traditionalDetail: 'Stops compilation if syntax errors are found.',
     aiDetail: 'Verifies that every AI-selected tool is safe to apply.',
   },
 };
+
+const PIPELINE_ORDER = [
+  'source',
+  'lexical',
+  'syntax',
+  'semantic',
+  'intermediate',
+  'opt-traditional',
+  'opt-ai',
+  'codegen',
+  'machine',
+];
+
+function createLabelSprite(text: string, variant: 'default' | 'coral' | 'endpoint'): THREE.Sprite {
+  const canvas = document.createElement('canvas');
+  canvas.width = 512;
+  canvas.height = 112;
+  const ctx = canvas.getContext('2d');
+  if (ctx) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    const bgColor =
+      variant === 'coral' ? '#D97757' : variant === 'endpoint' ? '#141413' : '#FAF9F5';
+    const borderColor =
+      variant === 'endpoint' ? '#D97757' : variant === 'coral' ? '#FAF9F5' : '#D9D6CA';
+    const textColor =
+      variant === 'endpoint' ? '#FAF9F5' : '#141413';
+
+    ctx.font = '600 28px Inter, -apple-system, BlinkMacSystemFont, sans-serif';
+    const metrics = ctx.measureText(text);
+    const pillW = Math.min(488, Math.max(210, metrics.width + 64));
+    const pillH = 74;
+    const x = (canvas.width - pillW) / 2;
+    const y = (canvas.height - pillH) / 2;
+    const r = pillH / 2;
+
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.lineTo(x + pillW - r, y);
+    ctx.quadraticCurveTo(x + pillW, y, x + pillW, y + r);
+    ctx.lineTo(x + pillW, y + pillH - r);
+    ctx.quadraticCurveTo(x + pillW, y + pillH, x + pillW - r, y + pillH);
+    ctx.lineTo(x + r, y + pillH);
+    ctx.quadraticCurveTo(x, y + pillH, x, y + pillH - r);
+    ctx.lineTo(x, y + r);
+    ctx.quadraticCurveTo(x, y, x + r, y);
+    ctx.closePath();
+
+    ctx.fillStyle = bgColor;
+    ctx.fill();
+    ctx.lineWidth = 4;
+    ctx.strokeStyle = borderColor;
+    ctx.stroke();
+
+    ctx.fillStyle = textColor;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(text, canvas.width / 2, canvas.height / 2 + 1);
+  }
+
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  texture.needsUpdate = true;
+
+  const material = new THREE.SpriteMaterial({
+    map: texture,
+    transparent: true,
+    depthTest: false,
+  });
+  const sprite = new THREE.Sprite(material);
+  sprite.scale.set(4.8, 1.05, 1);
+  sprite.renderOrder = 10;
+  return sprite;
+}
 
 export interface ThreePipelineDiagramProps {
   isDark?: boolean;
@@ -154,23 +233,18 @@ export interface ThreePipelineDiagramProps {
 }
 
 export const ThreePipelineDiagram: React.FC<ThreePipelineDiagramProps> = ({
-  isDark = true,
   isRunning = false,
   benchmarkStep = '',
-  currentResult = null,
   onRunBenchmark,
   programName = 'Matrix Multiplication O(N³)',
-  onOpenStudio,
-  heightClass = 'h-[500px] sm:h-[720px]',
+  heightClass = 'h-[560px] sm:h-[760px]',
 }) => {
   const mountRef = useRef<HTMLDivElement>(null);
   const sceneRef = useRef<THREE.Scene | null>(null);
   const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
   const controlsRef = useRef<OrbitControls | null>(null);
-  const floorMatRef = useRef<THREE.MeshStandardMaterial | null>(null);
-  const gridHelperRef = useRef<THREE.GridHelper | null>(null);
 
-  const [selectedStageId, setSelectedStageId] = useState<string | null>(null);
+  const [selectedStageId, setSelectedStageId] = useState<string | null>('lexical');
   const [isPlaying, setIsPlaying] = useState<boolean>(true);
   const [speed, setSpeed] = useState<number>(1);
   const [hoveredStageId, setHoveredStageId] = useState<string | null>(null);
@@ -188,14 +262,12 @@ export const ThreePipelineDiagram: React.FC<ThreePipelineDiagramProps> = ({
     animStateRef.current.speed = isRunning ? 2.5 : speed;
   }, [speed, isRunning]);
 
-  // Main Three.js Scene Setup
   useEffect(() => {
     if (!mountRef.current) return;
     const container = mountRef.current;
     const width = container.clientWidth || 900;
-    const height = container.clientHeight || 640;
+    const height = container.clientHeight || 720;
 
-    // Detect software WebGL safely
     const isSoftwareGl = (() => {
       try {
         const gl = document.createElement('canvas').getContext('webgl2');
@@ -210,19 +282,17 @@ export const ThreePipelineDiagram: React.FC<ThreePipelineDiagramProps> = ({
       }
     })();
 
-    // 1. Scene & Fog
     const scene = new THREE.Scene();
     sceneRef.current = scene;
-    const bgHex = isDark ? 0x000000 : 0xF5F5F7;
+    const bgHex = 0x141413;
     scene.background = new THREE.Color(bgHex);
-    scene.fog = new THREE.FogExp2(bgHex, 0.018);
+    scene.fog = new THREE.FogExp2(bgHex, 0.012);
 
-    // 2. Camera: isometric perspective view overlooking the whole pipeline
+    // Overhead angled camera: negative Z (START) is at TOP of screen, positive Z (END) is at BOTTOM
     const camera = new THREE.PerspectiveCamera(42, width / height, 0.1, 200);
-    camera.position.set(0, 16, 26);
+    camera.position.set(0, 26, 22);
     cameraRef.current = camera;
 
-    // 3. Renderer
     const renderer = new THREE.WebGLRenderer({
       antialias: !isSoftwareGl,
       powerPreference: 'high-performance',
@@ -237,106 +307,102 @@ export const ThreePipelineDiagram: React.FC<ThreePipelineDiagramProps> = ({
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     container.appendChild(renderer.domElement);
 
-    // 4. Studio Environment
     const pmremGenerator = new THREE.PMREMGenerator(renderer);
     scene.environment = pmremGenerator.fromScene(new RoomEnvironment(), 0.04).texture;
     pmremGenerator.dispose();
 
-    // 5. Controls
     const controls = new OrbitControls(camera, renderer.domElement);
     controlsRef.current = controls;
     controls.enableDamping = !isSoftwareGl;
     controls.dampingFactor = 0.06;
-    controls.maxPolarAngle = Math.PI / 2 - 0.03;
-    controls.minDistance = 8;
-    controls.maxDistance = 55;
-    controls.target.set(0, 0, 0);
+    controls.maxPolarAngle = Math.PI / 2 - 0.04;
+    controls.minDistance = 10;
+    controls.maxDistance = 60;
+    controls.target.set(0, 0, -0.5);
 
-    // 6. Monochrome Lighting
-    const ambientLight = new THREE.AmbientLight(0xffffff, isDark ? 0.6 : 0.9);
+    const ambientLight = new THREE.AmbientLight(0xfaf9f5, 0.8);
     scene.add(ambientLight);
 
-    const keyLight = new THREE.DirectionalLight(0xffffff, isDark ? 1.8 : 2.0);
-    keyLight.position.set(15, 25, 18);
+    const keyLight = new THREE.DirectionalLight(0xfaf9f5, 1.8);
+    keyLight.position.set(14, 28, 16);
     keyLight.castShadow = !isSoftwareGl;
     if (!isSoftwareGl) {
       keyLight.shadow.mapSize.width = 1024;
       keyLight.shadow.mapSize.height = 1024;
       keyLight.shadow.camera.near = 0.5;
-      keyLight.shadow.camera.far = 60;
+      keyLight.shadow.camera.far = 70;
       keyLight.shadow.bias = -0.0005;
     }
     scene.add(keyLight);
 
-    const fillLight = new THREE.DirectionalLight(0xa1a1aa, 0.7);
-    fillLight.position.set(-15, 15, -15);
+    const fillLight = new THREE.DirectionalLight(0xd97757, 0.7);
+    fillLight.position.set(-15, 16, -15);
     scene.add(fillLight);
 
-    // 7. Ground Grid
-    const gridHelper = new THREE.GridHelper(70, 70, isDark ? 0x3f3f46 : 0xd4d4d8, isDark ? 0x18181b : 0xe4e4e7);
+    const gridHelper = new THREE.GridHelper(70, 70, 0x5e5d57, 0x262523);
     gridHelper.position.y = -2;
-    gridHelperRef.current = gridHelper;
     scene.add(gridHelper);
 
     const floorGeo = new THREE.PlaneGeometry(90, 90);
     const floorMat = new THREE.MeshStandardMaterial({
-      color: isDark ? 0x09090b : 0xeeeeF2,
-      roughness: 0.9,
-      metalness: 0.1,
+      color: 0x141413,
+      roughness: 0.92,
+      metalness: 0.08,
       polygonOffset: true,
       polygonOffsetFactor: 1,
       polygonOffsetUnits: 1,
     });
-    floorMatRef.current = floorMat;
     const floor = new THREE.Mesh(floorGeo, floorMat);
     floor.rotation.x = -Math.PI / 2;
     floor.position.y = -2.01;
     floor.receiveShadow = !isSoftwareGl;
     scene.add(floor);
 
-    // ================= BUILD EXACT COMPILER PIPELINE =================
-    // Materials (Monochrome: Titanium, Obsidian, Chrome, Wireframe)
-    const matTitanium = new THREE.MeshStandardMaterial({ color: 0x3f3f46, metalness: 0.8, roughness: 0.25 });
-    const matChrome = new THREE.MeshStandardMaterial({ color: 0xf4f4f5, metalness: 0.95, roughness: 0.1 });
-    const matObsidian = new THREE.MeshStandardMaterial({ color: 0x18181b, metalness: 0.6, roughness: 0.3 });
-    const matGlowingWhite = new THREE.MeshBasicMaterial({ color: 0xffffff });
-    const matWireframe = new THREE.MeshBasicMaterial({ color: 0xffffff, wireframe: true, transparent: true, opacity: 0.35 });
+    const matMuted = new THREE.MeshStandardMaterial({ color: 0x5e5d57, metalness: 0.4, roughness: 0.35 });
+    const matCream = new THREE.MeshStandardMaterial({ color: 0xf0eee6, metalness: 0.3, roughness: 0.3 });
+    const matDarkBase = new THREE.MeshStandardMaterial({ color: 0x242321, metalness: 0.4, roughness: 0.4 });
+    const matCoral = new THREE.MeshStandardMaterial({ color: 0xd97757, metalness: 0.25, roughness: 0.3 });
+    const matWireframe = new THREE.MeshBasicMaterial({ color: 0xc9c6ba, wireframe: true, transparent: true, opacity: 0.35 });
 
     const stageMeshes: Record<string, THREE.Group> = {};
     const raycastTargets: THREE.Object3D[] = [];
 
-    // Helper: Build a stage platform with label
     const createStagePlatform = (
       id: string,
       x: number,
       z: number,
       coreMesh: THREE.Object3D,
-      pedestalW = 2.4,
-      pedestalD = 2.4
+      labelVariant: 'default' | 'coral' | 'endpoint' = 'default',
+      pedestalW = 2.6,
+      pedestalD = 2.1
     ) => {
       const g = new THREE.Group();
       g.userData = { stageId: id };
 
-      // Base Pedestal
-      const baseMesh = new THREE.Mesh(new THREE.BoxGeometry(pedestalW, 0.4, pedestalD), matObsidian);
+      const baseMesh = new THREE.Mesh(new THREE.BoxGeometry(pedestalW, 0.4, pedestalD), matDarkBase);
       baseMesh.position.y = -1.8;
       baseMesh.receiveShadow = !isSoftwareGl;
       baseMesh.castShadow = !isSoftwareGl;
       g.add(baseMesh);
 
-      // Top Rim
-      const rimMesh = new THREE.Mesh(new THREE.BoxGeometry(pedestalW + 0.1, 0.08, pedestalD + 0.1), matTitanium);
+      const rimMesh = new THREE.Mesh(new THREE.BoxGeometry(pedestalW + 0.1, 0.08, pedestalD + 0.1), matMuted);
       rimMesh.position.y = -1.56;
       g.add(rimMesh);
 
-      // Core model
-      coreMesh.position.y = 0;
+      coreMesh.position.y = -0.2;
       g.add(coreMesh);
 
-      // Selection Ring
-      const ringGeo = new THREE.RingGeometry(pedestalW * 0.6, pedestalW * 0.68, 32);
+      // Clear floating label directly above pedestal
+      const meta = COMPILER_STAGES[id];
+      if (meta) {
+        const label = createLabelSprite(meta.shortLabel, labelVariant);
+        label.position.set(0, 1.9, 0);
+        g.add(label);
+      }
+
+      const ringGeo = new THREE.RingGeometry(pedestalW * 0.58, pedestalW * 0.68, 32);
       const ringMat = new THREE.MeshBasicMaterial({
-        color: 0xffffff,
+        color: 0xd97757,
         side: THREE.DoubleSide,
         transparent: true,
         opacity: 0,
@@ -347,9 +413,8 @@ export const ThreePipelineDiagram: React.FC<ThreePipelineDiagramProps> = ({
       ring.name = 'selectionRing';
       g.add(ring);
 
-      // Raycast hitbox
       const hitBox = new THREE.Mesh(
-        new THREE.BoxGeometry(pedestalW + 0.6, 3.8, pedestalD + 0.6),
+        new THREE.BoxGeometry(pedestalW + 1.0, 4.0, pedestalD + 0.8),
         new THREE.MeshBasicMaterial({ visible: false })
       );
       hitBox.userData = { stageId: id };
@@ -362,188 +427,224 @@ export const ThreePipelineDiagram: React.FC<ThreePipelineDiagramProps> = ({
       return g;
     };
 
-    // Central pipeline runs along X axis: from -14 to +14
-    // 1. Source Code Input (X = -13, Z = 0)
+    // Helper: Downward cone arrow pointing along +Z (top-to-bottom flow)
+    const addFlowArrow = (from: THREE.Vector3, to: THREE.Vector3, colorHex = 0xc9c6ba) => {
+      const mid = new THREE.Vector3().addVectors(from, to).multiplyScalar(0.5);
+      const dir = new THREE.Vector3().subVectors(to, from).normalize();
+      const cone = new THREE.Mesh(
+        new THREE.ConeGeometry(0.28, 0.65, 16),
+        new THREE.MeshBasicMaterial({ color: colorHex })
+      );
+      cone.position.copy(mid);
+      cone.position.y = -1.65;
+      cone.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir);
+      scene.add(cone);
+    };
+
+    // ================= TOP-TO-BOTTOM LAYOUT (Z: -15.5 START -> +14.5 END) =================
+    // 0. START: Source Code (Z = -15.5)
     const sourceCore = new THREE.Group();
-    sourceCore.add(new THREE.Mesh(new THREE.BoxGeometry(1.4, 2.0, 0.4), matTitanium));
-    sourceCore.add(new THREE.Mesh(new THREE.BoxGeometry(1.45, 2.05, 0.45), matWireframe));
-    createStagePlatform('source', -13, 0, sourceCore);
+    sourceCore.add(new THREE.Mesh(new THREE.BoxGeometry(1.4, 1.6, 0.45), matCoral));
+    sourceCore.add(new THREE.Mesh(new THREE.BoxGeometry(1.45, 1.65, 0.5), matWireframe));
+    createStagePlatform('source', 0, -15.5, sourceCore, 'endpoint');
 
-    // 2. Lexical Analysis (X = -9.2, Z = 0)
+    // 1. Lexical Analysis (Z = -11.5)
     const lexCore = new THREE.Group();
-    lexCore.add(new THREE.Mesh(new THREE.CylinderGeometry(0.8, 1.0, 1.6, 6), matChrome));
-    lexCore.add(new THREE.Mesh(new THREE.CylinderGeometry(0.85, 1.05, 1.65, 6), matWireframe));
-    createStagePlatform('lexical', -9.2, 0, lexCore);
+    lexCore.add(new THREE.Mesh(new THREE.CylinderGeometry(0.75, 0.9, 1.3, 6), matCream));
+    lexCore.add(new THREE.Mesh(new THREE.CylinderGeometry(0.8, 0.95, 1.35, 6), matWireframe));
+    createStagePlatform('lexical', 0, -11.5, lexCore, 'default');
 
-    // 3. Syntax Analysis (X = -5.4, Z = 0)
+    // 2. Syntax Analysis (Z = -7.5)
     const synCore = new THREE.Group();
-    synCore.add(new THREE.Mesh(new THREE.OctahedronGeometry(1.1, 0), matChrome));
-    synCore.add(new THREE.Mesh(new THREE.OctahedronGeometry(1.3, 1), matWireframe));
-    createStagePlatform('syntax', -5.4, 0, synCore);
+    synCore.add(new THREE.Mesh(new THREE.OctahedronGeometry(0.95, 0), matCream));
+    synCore.add(new THREE.Mesh(new THREE.OctahedronGeometry(1.15, 1), matWireframe));
+    createStagePlatform('syntax', 0, -7.5, synCore, 'default');
 
-    // 4. Semantic Analysis (X = -1.6, Z = 0)
+    // 3. Semantic Analysis (Z = -3.5)
     const semCore = new THREE.Group();
-    semCore.add(new THREE.Mesh(new THREE.DodecahedronGeometry(1.0, 0), matTitanium));
-    semCore.add(new THREE.Mesh(new THREE.DodecahedronGeometry(1.2, 0), matWireframe));
-    createStagePlatform('semantic', -1.6, 0, semCore);
+    semCore.add(new THREE.Mesh(new THREE.DodecahedronGeometry(0.9, 0), matMuted));
+    semCore.add(new THREE.Mesh(new THREE.DodecahedronGeometry(1.08, 0), matWireframe));
+    createStagePlatform('semantic', 0, -3.5, semCore, 'default');
 
-    // 5. Intermediate Code Gen (LLVM SSA IR) (X = 2.2, Z = 0)
+    // 4. Intermediate Code Gen (Z = +0.5)
     const irCore = new THREE.Group();
-    irCore.add(new THREE.Mesh(new THREE.BoxGeometry(1.6, 1.6, 1.6), matTitanium));
+    irCore.add(new THREE.Mesh(new THREE.BoxGeometry(1.35, 1.35, 1.35), matMuted));
     for (let i = 0; i < 4; i++) {
-      const node = new THREE.Mesh(new THREE.OctahedronGeometry(0.28, 0), matChrome);
-      node.position.set(i % 2 === 0 ? 0.4 : -0.4, i < 2 ? 0.4 : -0.4, 0);
+      const node = new THREE.Mesh(new THREE.OctahedronGeometry(0.24, 0), matCream);
+      node.position.set(i % 2 === 0 ? 0.35 : -0.35, i < 2 ? 0.35 : -0.35, 0);
       irCore.add(node);
     }
-    createStagePlatform('intermediate', 2.2, 0, irCore);
+    createStagePlatform('intermediate', 0, 0.5, irCore, 'default');
 
-    // ================= 6. CODE OPTIMIZATION FORK =================
-    // At Code Optimization (X = 6.2), the pipeline forks into two distinct platforms:
-    // 6A. Traditional Optimization (Z = -2.8): Fixed -O2 Passes
+    // 5. Code Optimization Fork (Z = +5.2, X = -4.0 Left Normal vs +4.0 Right AI)
     const optTradCore = new THREE.Group();
     for (let i = 0; i < 3; i++) {
-      const r = new THREE.Mesh(new THREE.TorusGeometry(0.9 - i * 0.22, 0.08, 16, 32), matTitanium);
+      const r = new THREE.Mesh(new THREE.TorusGeometry(0.8 - i * 0.2, 0.07, 16, 32), matMuted);
       r.rotation.x = Math.PI / 2;
-      r.position.y = (i - 1) * 0.45;
+      r.position.y = (i - 1) * 0.38;
       optTradCore.add(r);
     }
-    optTradCore.add(new THREE.Mesh(new THREE.CylinderGeometry(0.35, 0.35, 1.6, 16), matObsidian));
-    createStagePlatform('opt-traditional', 6.2, -2.8, optTradCore, 2.6, 2.2);
+    optTradCore.add(new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.3, 1.35, 16), matCream));
+    createStagePlatform('opt-traditional', -4.0, 5.2, optTradCore, 'default', 2.8, 2.2);
 
-    // 6B. AI-Assisted Optimization (Z = +2.8): Gemini Cognitive IR Core + Passes
     const optAICore = new THREE.Group();
-    const ico = new THREE.Mesh(new THREE.IcosahedronGeometry(1.0, 1), matChrome);
-    optAICore.add(ico);
-    const synIco = new THREE.Mesh(new THREE.IcosahedronGeometry(1.35, 1), matWireframe);
-    optAICore.add(synIco);
-    const ringOrbit = new THREE.Mesh(new THREE.TorusGeometry(1.6, 0.04, 16, 48), matGlowingWhite);
+    optAICore.add(new THREE.Mesh(new THREE.IcosahedronGeometry(0.9, 1), matCoral));
+    optAICore.add(new THREE.Mesh(new THREE.IcosahedronGeometry(1.2, 1), matWireframe));
+    const ringOrbit = new THREE.Mesh(new THREE.TorusGeometry(1.38, 0.045, 16, 48), matCream);
     ringOrbit.rotation.x = Math.PI / 3;
     ringOrbit.name = 'aiOrbit';
     optAICore.add(ringOrbit);
-    createStagePlatform('opt-ai', 6.2, 2.8, optAICore, 2.6, 2.2);
+    createStagePlatform('opt-ai', 4.0, 5.2, optAICore, 'coral', 2.8, 2.2);
 
-    // 7. Code Generation (X = 10.2, Z = 0)
+    // 6. Target Code Generation (Z = +10.0)
     const codeGenCore = new THREE.Group();
-    codeGenCore.add(new THREE.Mesh(new THREE.BoxGeometry(1.6, 0.35, 1.6), matObsidian));
-    const die = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.5, 0.8), matChrome);
+    codeGenCore.add(new THREE.Mesh(new THREE.BoxGeometry(1.4, 0.32, 1.4), matMuted));
+    const die = new THREE.Mesh(new THREE.BoxGeometry(0.75, 0.45, 0.75), matCream);
     die.position.y = 0.2;
     codeGenCore.add(die);
-    createStagePlatform('codegen', 10.2, 0, codeGenCore);
+    createStagePlatform('codegen', 0, 10.0, codeGenCore, 'default');
 
-    // 8. Machine Language Code (Executable Binary) (X = 13.8, Z = 0)
+    // END: Machine Language Code (Z = +14.2)
     const machineCore = new THREE.Group();
-    machineCore.add(new THREE.Mesh(new THREE.BoxGeometry(1.4, 1.4, 1.4), matChrome));
-    machineCore.add(new THREE.Mesh(new THREE.BoxGeometry(1.55, 1.55, 1.55), matWireframe));
-    createStagePlatform('machine', 13.8, 0, machineCore);
+    machineCore.add(new THREE.Mesh(new THREE.BoxGeometry(1.3, 1.3, 1.3), matCoral));
+    machineCore.add(new THREE.Mesh(new THREE.BoxGeometry(1.45, 1.45, 1.45), matWireframe));
+    createStagePlatform('machine', 0, 14.2, machineCore, 'endpoint');
 
-    // ================= FLANKING ARCHITECTURAL TOWERS =================
-    // Left: Symbol Table Tower (X = 0, Z = -6.5)
+    // Flanking Towers: Variable Table (LEFT) & Error Checker (RIGHT)
     const symTableCore = new THREE.Group();
-    symTableCore.add(new THREE.Mesh(new THREE.BoxGeometry(1.6, 3.2, 1.6), matObsidian));
-    symTableCore.add(new THREE.Mesh(new THREE.BoxGeometry(1.65, 3.25, 1.65), matWireframe));
-    createStagePlatform('symbol-table', 0, -6.8, symTableCore, 2.8, 2.8);
+    symTableCore.add(new THREE.Mesh(new THREE.BoxGeometry(1.4, 3.0, 1.4), matDarkBase));
+    symTableCore.add(new THREE.Mesh(new THREE.BoxGeometry(1.45, 3.05, 1.45), matWireframe));
+    createStagePlatform('symbol-table', -9.2, -1.5, symTableCore, 'default', 2.8, 2.8);
 
-    // Right: Error Handling Sentinel Tower (X = 0, Z = +6.8)
     const errCore = new THREE.Group();
-    errCore.add(new THREE.Mesh(new THREE.BoxGeometry(1.6, 3.2, 1.6), matObsidian));
-    errCore.add(new THREE.Mesh(new THREE.BoxGeometry(1.65, 3.25, 1.65), matWireframe));
-    createStagePlatform('error-handling', 0, 6.8, errCore, 2.8, 2.8);
+    errCore.add(new THREE.Mesh(new THREE.BoxGeometry(1.4, 3.0, 1.4), matDarkBase));
+    errCore.add(new THREE.Mesh(new THREE.BoxGeometry(1.45, 3.05, 1.45), matWireframe));
+    createStagePlatform('error-handling', 9.2, -1.5, errCore, 'default', 2.8, 2.8);
 
-    // ================= CONNECTING CONDUIT GUIDE LINES =================
-    const conduitMat = new THREE.LineBasicMaterial({ color: 0x52525b, transparent: true, opacity: 0.5 });
-    const busMat = new THREE.LineDashedMaterial({ color: 0x71717a, dashSize: 0.4, gapSize: 0.25, transparent: true, opacity: 0.45 });
+    // ================= CONDUITS & DIRECTIONAL ARROWS =================
+    const conduitMat = new THREE.LineBasicMaterial({ color: 0xc9c6ba, transparent: true, opacity: 0.75 });
+    const coralConduitMat = new THREE.LineBasicMaterial({ color: 0xd97757, transparent: true, opacity: 0.95 });
+    const busMat = new THREE.LineDashedMaterial({ color: 0x5e5d57, dashSize: 0.4, gapSize: 0.25, transparent: true, opacity: 0.6 });
 
-    // Main line from Source to Intermediate
-    const mainPoints1 = [
-      new THREE.Vector3(-13, -1.8, 0),
-      new THREE.Vector3(2.2, -1.8, 0),
-    ];
-    scene.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(mainPoints1), conduitMat));
+    // Top main line: START (Z=-15.5) -> Phase 4 (Z=0.5)
+    scene.add(
+      new THREE.Line(
+        new THREE.BufferGeometry().setFromPoints([
+          new THREE.Vector3(0, -1.8, -15.5),
+          new THREE.Vector3(0, -1.8, 0.5),
+        ]),
+        conduitMat
+      )
+    );
 
-    // Fork lines from Intermediate (X=2.2) to Trad Opt (X=6.2, Z=-2.8) and AI Opt (X=6.2, Z=2.8)
-    const forkTrad = [
-      new THREE.Vector3(2.2, -1.8, 0),
-      new THREE.Vector3(6.2, -1.8, -2.8),
-      new THREE.Vector3(10.2, -1.8, 0),
-    ];
-    scene.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(forkTrad), conduitMat));
+    // Downward arrowheads between Start -> 1 -> 2 -> 3 -> 4
+    [-15.5, -11.5, -7.5, -3.5].forEach((zStart) => {
+      addFlowArrow(
+        new THREE.Vector3(0, -1.8, zStart),
+        new THREE.Vector3(0, -1.8, zStart + 4.0),
+        0xc9c6ba
+      );
+    });
 
-    const forkAI = [
-      new THREE.Vector3(2.2, -1.8, 0),
-      new THREE.Vector3(6.2, -1.8, 2.8),
-      new THREE.Vector3(10.2, -1.8, 0),
-    ];
-    scene.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(forkAI), conduitMat));
+    // Fork Left (Standard -O2)
+    scene.add(
+      new THREE.Line(
+        new THREE.BufferGeometry().setFromPoints([
+          new THREE.Vector3(0, -1.8, 0.5),
+          new THREE.Vector3(-4.0, -1.8, 5.2),
+          new THREE.Vector3(0, -1.8, 10.0),
+        ]),
+        conduitMat
+      )
+    );
+    addFlowArrow(new THREE.Vector3(0, -1.8, 0.5), new THREE.Vector3(-4.0, -1.8, 5.2), 0xc9c6ba);
+    addFlowArrow(new THREE.Vector3(-4.0, -1.8, 5.2), new THREE.Vector3(0, -1.8, 10.0), 0xc9c6ba);
 
-    // End line from CodeGen to Machine Code
-    const mainPoints2 = [
-      new THREE.Vector3(10.2, -1.8, 0),
-      new THREE.Vector3(13.8, -1.8, 0),
-    ];
-    scene.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(mainPoints2), conduitMat));
+    // Fork Right (AI-Guided)
+    scene.add(
+      new THREE.Line(
+        new THREE.BufferGeometry().setFromPoints([
+          new THREE.Vector3(0, -1.8, 0.5),
+          new THREE.Vector3(4.0, -1.8, 5.2),
+          new THREE.Vector3(0, -1.8, 10.0),
+        ]),
+        coralConduitMat
+      )
+    );
+    addFlowArrow(new THREE.Vector3(0, -1.8, 0.5), new THREE.Vector3(4.0, -1.8, 5.2), 0xd97757);
+    addFlowArrow(new THREE.Vector3(4.0, -1.8, 5.2), new THREE.Vector3(0, -1.8, 10.0), 0xd97757);
 
-    // Symbol Table Bus lines connecting to stages (matching user diagram!)
-    const stageXPositions = [-9.2, -5.4, -1.6, 2.2, 6.2, 10.2];
-    stageXPositions.forEach((xPos) => {
-      const symPoints = [
-        new THREE.Vector3(0, -1.8, -6.8),
-        new THREE.Vector3(xPos, -1.8, -6.8),
-        new THREE.Vector3(xPos, -1.8, xPos === 6.2 ? -2.8 : 0),
-      ];
-      const symLine = new THREE.Line(new THREE.BufferGeometry().setFromPoints(symPoints), busMat);
+    // Bottom main line: Phase 6 (Z=10.0) -> END (Z=14.2)
+    scene.add(
+      new THREE.Line(
+        new THREE.BufferGeometry().setFromPoints([
+          new THREE.Vector3(0, -1.8, 10.0),
+          new THREE.Vector3(0, -1.8, 14.2),
+        ]),
+        conduitMat
+      )
+    );
+    addFlowArrow(new THREE.Vector3(0, -1.8, 10.0), new THREE.Vector3(0, -1.8, 14.2), 0xd97757);
+
+    // Horizontal bus lines to Variable Table (Left) & Error Checker (Right)
+    const busZPositions = [-11.5, -7.5, -3.5, 0.5, 5.2, 10.0];
+    busZPositions.forEach((zPos) => {
+      const symLine = new THREE.Line(
+        new THREE.BufferGeometry().setFromPoints([
+          new THREE.Vector3(-9.2, -1.8, -1.5),
+          new THREE.Vector3(-9.2, -1.8, zPos),
+          new THREE.Vector3(zPos === 5.2 ? -4.0 : 0, -1.8, zPos),
+        ]),
+        busMat
+      );
       symLine.computeLineDistances();
       scene.add(symLine);
 
-      // Error Handling Bus lines connecting to stages
-      const errPoints = [
-        new THREE.Vector3(0, -1.8, 6.8),
-        new THREE.Vector3(xPos, -1.8, 6.8),
-        new THREE.Vector3(xPos, -1.8, xPos === 6.2 ? 2.8 : 0),
-      ];
-      const errLine = new THREE.Line(new THREE.BufferGeometry().setFromPoints(errPoints), busMat);
+      const errLine = new THREE.Line(
+        new THREE.BufferGeometry().setFromPoints([
+          new THREE.Vector3(9.2, -1.8, -1.5),
+          new THREE.Vector3(9.2, -1.8, zPos),
+          new THREE.Vector3(zPos === 5.2 ? 4.0 : 0, -1.8, zPos),
+        ]),
+        busMat
+      );
       errLine.computeLineDistances();
       scene.add(errLine);
     });
 
-    // ================= FLOWING DATA INSTRUCTION PARTICLES =================
-    const packetCount = 18;
+    // ================= FLOWING PACKETS TOP -> BOTTOM =================
+    const packetCount = 16;
     const packetGeo = new THREE.BoxGeometry(0.28, 0.28, 0.28);
-    const packetMat = new THREE.MeshStandardMaterial({
-      color: 0xffffff,
-      roughness: 0.1,
-      metalness: 0.9,
-    });
+    const packetCreamMat = new THREE.MeshStandardMaterial({ color: 0xfaf9f5, roughness: 0.2, metalness: 0.3 });
+    const packetCoralMat = new THREE.MeshStandardMaterial({ color: 0xd97757, roughness: 0.2, metalness: 0.3 });
     const packets: { mesh: THREE.Mesh; progress: number; path: 'trad' | 'ai' }[] = [];
 
     for (let i = 0; i < packetCount; i++) {
-      const p = new THREE.Mesh(packetGeo, packetMat);
+      const isAI = i % 2 !== 0;
+      const p = new THREE.Mesh(packetGeo, isAI ? packetCoralMat : packetCreamMat);
       scene.add(p);
       packets.push({
         mesh: p,
         progress: i / packetCount,
-        path: i % 2 === 0 ? 'trad' : 'ai',
+        path: isAI ? 'ai' : 'trad',
       });
     }
 
-    // Helper: calculate position along pipeline
     const getPipelinePosition = (t: number, path: 'trad' | 'ai') => {
-      const startX = -13;
-      const endX = 13.8;
-      const totalLen = endX - startX;
-      const curX = startX + t * totalLen;
+      const startZ = -15.5;
+      const endZ = 14.2;
+      const curZ = startZ + t * (endZ - startZ);
 
-      let curZ = 0;
-      if (curX > 2.2 && curX < 10.2) {
-        // In the optimization chamber fork
-        const segT = (curX - 2.2) / (10.2 - 2.2);
-        const maxZ = path === 'trad' ? -2.8 : 2.8;
-        curZ = Math.sin(segT * Math.PI) * maxZ;
+      let curX = 0;
+      if (curZ > 0.5 && curZ < 10.0) {
+        const segT = (curZ - 0.5) / (10.0 - 0.5);
+        const maxX = path === 'trad' ? -4.0 : 4.0;
+        curX = Math.sin(segT * Math.PI) * maxX;
       }
 
-      return new THREE.Vector3(curX, -0.6, curZ);
+      return new THREE.Vector3(curX, -0.7, curZ);
     };
 
-    // Raycast handling
     const raycaster = new THREE.Raycaster();
     const mouse = new THREE.Vector2(-999, -999);
 
@@ -580,7 +681,6 @@ export const ThreePipelineDiagram: React.FC<ThreePipelineDiagramProps> = ({
     renderer.domElement.addEventListener('mousemove', onPointerMove);
     renderer.domElement.addEventListener('click', onClick);
 
-    // ================= TICK ANIMATION LOOP =================
     let animId = 0;
     const clock = new THREE.Clock();
 
@@ -589,13 +689,12 @@ export const ThreePipelineDiagram: React.FC<ThreePipelineDiagramProps> = ({
       const elapsed = clock.getElapsedTime();
       const { isPlaying: playing, speed: simSpeed } = animStateRef.current;
 
-      // Update pedestals & selection rings
       Object.entries(stageMeshes).forEach(([id, grp]) => {
         const ring = grp.getObjectByName('selectionRing') as THREE.Mesh;
         if (ring) {
           const isSelected = id === selectedStageId;
           const isHovered = id === hoveredStageId;
-          const targetOpacity = isSelected ? 0.9 : isHovered ? 0.45 : 0;
+          const targetOpacity = isSelected ? 0.95 : isHovered ? 0.5 : 0;
           (ring.material as THREE.MeshBasicMaterial).opacity = THREE.MathUtils.damp(
             (ring.material as THREE.MeshBasicMaterial).opacity,
             targetOpacity,
@@ -604,27 +703,25 @@ export const ThreePipelineDiagram: React.FC<ThreePipelineDiagramProps> = ({
           );
         }
 
-        // Idle rotation of stage core models
         if (playing) {
           const core = grp.children[2];
           if (core) {
-            core.rotation.y += delta * 0.3 * simSpeed;
+            core.rotation.y += delta * 0.25 * simSpeed;
             if (id === 'opt-ai') {
               const orbit = core.getObjectByName('aiOrbit');
-              if (orbit) orbit.rotation.z += delta * 1.6 * simSpeed;
+              if (orbit) orbit.rotation.z += delta * 1.4 * simSpeed;
             }
           }
         }
       });
 
-      // Animate flowing instruction packets along the conveyor
       if (playing) {
-        const flowStep = delta * 0.12 * simSpeed;
+        const flowStep = delta * 0.11 * simSpeed;
         packets.forEach((p, idx) => {
           p.progress = (p.progress + flowStep) % 1.0;
           const pos = getPipelinePosition(p.progress, p.path);
           p.mesh.position.copy(pos);
-          p.mesh.position.y += Math.sin(elapsed * 4 + idx) * 0.08;
+          p.mesh.position.y += Math.sin(elapsed * 4 + idx) * 0.07;
           p.mesh.rotation.y += delta * 2;
         });
       }
@@ -660,26 +757,12 @@ export const ThreePipelineDiagram: React.FC<ThreePipelineDiagramProps> = ({
     };
   }, [selectedStageId, hoveredStageId]);
 
-  // Handle dynamic theme changes
-  useEffect(() => {
-    if (sceneRef.current) {
-      const bgHex = isDark ? 0x000000 : 0xF5F5F7;
-      sceneRef.current.background = new THREE.Color(bgHex);
-      if (sceneRef.current.fog) {
-        (sceneRef.current.fog as THREE.FogExp2).color.setHex(bgHex);
-      }
-    }
-    if (floorMatRef.current) {
-      floorMatRef.current.color.setHex(isDark ? 0x09090b : 0xeeeeF2);
-    }
-  }, [isDark]);
-
   const activeStage = selectedStageId ? COMPILER_STAGES[selectedStageId] : null;
 
   const handleResetCamera = () => {
     if (cameraRef.current && controlsRef.current) {
-      cameraRef.current.position.set(0, 16, 26);
-      controlsRef.current.target.set(0, 0, 0);
+      cameraRef.current.position.set(0, 26, 22);
+      controlsRef.current.target.set(0, 0, -0.5);
       controlsRef.current.update();
     }
   };
@@ -687,182 +770,207 @@ export const ThreePipelineDiagram: React.FC<ThreePipelineDiagramProps> = ({
   const handleViewPreset = (preset: 'overview' | 'opt-fork' | 'top') => {
     if (!cameraRef.current || !controlsRef.current) return;
     if (preset === 'overview') {
-      cameraRef.current.position.set(0, 16, 26);
-      controlsRef.current.target.set(0, 0, 0);
+      cameraRef.current.position.set(0, 26, 22);
+      controlsRef.current.target.set(0, 0, -0.5);
     } else if (preset === 'opt-fork') {
-      cameraRef.current.position.set(6.2, 7, 12);
-      controlsRef.current.target.set(6.2, 0, 0);
+      cameraRef.current.position.set(0, 13, 15);
+      controlsRef.current.target.set(0, 0, 5.2);
     } else if (preset === 'top') {
-      cameraRef.current.position.set(0, 32, 0.1);
-      controlsRef.current.target.set(0, 0, 0);
+      cameraRef.current.position.set(0, 38, 1.5);
+      controlsRef.current.target.set(0, 0, -0.5);
     }
     controlsRef.current.update();
   };
 
   return (
-    <div className={`relative w-full ${heightClass} rounded-3xl apple-glass overflow-hidden flex flex-col font-sans select-none transition-colors duration-300`}>
-      {/* 3D WebGL Canvas */}
-      <div ref={mountRef} className="w-full h-full relative cursor-grab active:cursor-grabbing" />
-
-      {/* Top Floating HUD: Responsive container prevents overlap on mobile */}
-      <div className="absolute top-3 left-3 right-3 z-20 pointer-events-none flex flex-col sm:flex-row sm:items-start justify-between gap-2">
-        {/* Top Left Floating Pill: Title & Context */}
-        <div className="px-3 sm:px-4 py-2 sm:py-2.5 rounded-2xl apple-glass-pill pointer-events-auto shadow-sm text-xs space-y-0.5 max-w-md">
-          <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
-            <span className="w-2 h-2 rounded-full bg-black dark:bg-white animate-pulse shrink-0" />
-            <span className="font-semibold tracking-tight text-black dark:text-white text-xs">
-              Live 3D Compiler Flow
-            </span>
-            <span className="text-zinc-400">•</span>
-            <span className="font-mono text-[10px] text-zinc-600 dark:text-zinc-400 truncate max-w-[160px] sm:max-w-none">
-              {programName}
-            </span>
-          </div>
-          <p className="text-[11px] text-zinc-600 dark:text-zinc-400 leading-snug hidden sm:block">
-            Interactive 3D view of how code turns into a runnable program, with Variable Lookup and Error Checking.
-          </p>
-        </div>
-
-        {/* Top Right Action Pill: Camera presets & Compare button */}
-        <div className="flex flex-wrap items-center gap-2 pointer-events-auto">
-          {onRunBenchmark && (
-            <button
-              onClick={onRunBenchmark}
-              disabled={isRunning}
-              className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl font-bold text-xs shadow-md transition-all cursor-pointer flex items-center space-x-1.5 ${
-                isRunning
-                  ? 'opacity-60 cursor-not-allowed bg-zinc-400 text-white'
-                  : 'bg-black dark:bg-white text-white dark:text-black hover:opacity-90 active:scale-95'
-              }`}
-            >
-              <Play className="w-3 h-3 fill-current" />
-              <span>Run Comparison</span>
-            </button>
-          )}
-
-          {/* View presets */}
-          <div className="flex items-center p-1 rounded-xl apple-glass-pill text-xs">
-            <button
-              onClick={() => handleViewPreset('overview')}
-              className="px-2 sm:px-2.5 py-1 rounded-lg text-zinc-500 hover:text-black dark:hover:text-white text-[10px] sm:text-[11px] font-medium cursor-pointer"
-            >
-              Overview
-            </button>
-            <button
-              onClick={() => handleViewPreset('opt-fork')}
-              className="px-2 sm:px-2.5 py-1 rounded-lg text-zinc-500 hover:text-black dark:hover:text-white text-[10px] sm:text-[11px] font-medium cursor-pointer"
-            >
-              Opt Fork
-            </button>
-            <button
-              onClick={() => handleViewPreset('top')}
-              className="px-2 sm:px-2.5 py-1 rounded-lg text-zinc-500 hover:text-black dark:hover:text-white text-[10px] sm:text-[11px] font-medium cursor-pointer"
-            >
-              Top-Down
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Live Benchmark Execution Notification */}
-      {isRunning && (
-        <div className="absolute top-28 sm:top-16 left-1/2 -translate-x-1/2 z-30 w-[90%] sm:w-auto flex items-center justify-center space-x-2.5 px-4 py-2 rounded-full apple-glass shadow-lg animate-pulse text-xs font-mono">
-          <div className="w-2 h-2 rounded-full bg-black dark:bg-white animate-ping shrink-0" />
-          <span className="font-semibold text-black dark:text-white truncate">
-            {benchmarkStep || 'Simultaneously compiling through both optimization branches...'}
-          </span>
-        </div>
-      )}
-
-      {/* Bottom Floating Clean Playback Bar (Non-obstructive) */}
-      <div className="absolute bottom-3 sm:bottom-4 left-1/2 -translate-x-1/2 z-20 w-[92%] sm:w-auto flex flex-wrap items-center justify-center gap-x-2.5 sm:gap-x-3 gap-y-1.5 px-3 sm:px-4 py-2 rounded-2xl apple-glass shadow-lg text-xs font-mono">
-        <button
-          onClick={() => setIsPlaying(!isPlaying)}
-          className="flex items-center space-x-1.5 px-2.5 py-1 rounded-xl bg-black dark:bg-white text-white dark:text-black font-semibold hover:opacity-90 transition-opacity cursor-pointer shadow-sm text-[11px]"
-        >
-          {isPlaying ? <Pause className="w-3 h-3 fill-current" /> : <Play className="w-3 h-3 fill-current" />}
-          <span>{isPlaying ? 'Pause' : 'Resume'}</span>
-        </button>
-
-        <span className="text-zinc-300 dark:text-zinc-700 hidden sm:inline">|</span>
-
-        <div className="flex items-center space-x-1 text-zinc-500">
-          <span>Speed:</span>
-          {[1, 2].map((s) => (
-            <button
-              key={s}
-              onClick={() => setSpeed(s)}
-              className={`px-2 py-0.5 rounded-lg text-[10px] cursor-pointer ${
-                speed === s
-                  ? 'bg-black/[0.08] dark:bg-white/[0.1] text-black dark:text-white font-bold'
-                  : 'hover:text-black dark:hover:text-white'
-              }`}
-            >
-              {s}x
-            </button>
-          ))}
-        </div>
-
-        <span className="text-zinc-300 dark:text-zinc-700 hidden sm:inline">|</span>
-
-        <button
-          onClick={handleResetCamera}
-          className="flex items-center space-x-1 text-zinc-500 hover:text-black dark:hover:text-white cursor-pointer text-[11px]"
-          title="Reset Camera View"
-        >
-          <RotateCcw className="w-3 h-3" />
-          <span>Reset</span>
-        </button>
-
-        <span className="text-zinc-300 dark:text-zinc-700 hidden sm:inline">|</span>
-
-        <span className="text-[11px] text-zinc-400 font-sans hidden md:inline">
-          Click any 3D node to inspect details
+    <div className="space-y-4">
+      {/* Interactive Phase Order Strip (Start -> 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> End) */}
+      <div className="p-3 sm:p-4 rounded-[20px] bg-[#FAF9F5] border-2 border-[#D9D6CA] flex flex-wrap items-center gap-1.5 text-xs">
+        <span className="text-[10.5px] uppercase font-semibold tracking-[0.08em] text-[#B5532F] mr-2">
+          Top-to-Bottom Flow:
         </span>
+        {PIPELINE_ORDER.map((id, idx) => {
+          const meta = COMPILER_STAGES[id];
+          const isSelected = selectedStageId === id;
+          return (
+            <React.Fragment key={id}>
+              <button
+                onClick={() => setSelectedStageId(id)}
+                className={`px-3 py-1 rounded-full text-[11px] font-semibold transition-colors cursor-pointer ${
+                  isSelected
+                    ? 'bg-[#D97757] text-[#141413]'
+                    : 'bg-[#F0EEE6] border border-[#D9D6CA] text-[#141413] hover:border-[#141413]'
+                }`}
+              >
+                {meta.shortLabel}
+              </button>
+              {idx < PIPELINE_ORDER.length - 1 && (
+                <ArrowDown className="w-3 h-3 text-[#5E5D57] -rotate-90 shrink-0" />
+              )}
+            </React.Fragment>
+          );
+        })}
       </div>
 
-      {/* Non-Intrusive Bottom Stage Detail Card (Only shown when a node is clicked!) */}
-      {activeStage && (
-        <div className="absolute bottom-16 left-1/2 -translate-x-1/2 z-30 w-[92%] max-w-2xl rounded-2xl apple-glass shadow-2xl p-4 text-xs space-y-2 animate-in fade-in slide-in-from-bottom-2 duration-200">
-          <div className="flex items-start justify-between border-b border-black/[0.06] dark:border-white/[0.08] pb-2">
-            <div className="flex items-center space-x-2.5">
-              <span className="px-2 py-0.5 rounded-md text-[10px] font-mono font-bold uppercase bg-black dark:bg-white text-white dark:text-black">
-                Phase {activeStage.phaseNumber}
+      {/* Main 3D Stage */}
+      <div className={`relative w-full ${heightClass} rounded-[24px] border-2 border-[#D9D6CA] bg-[#141413] overflow-hidden flex flex-col font-sans select-none`}>
+        <div ref={mountRef} className="w-full h-full relative cursor-grab active:cursor-grabbing" />
+
+        {/* Top Floating HUD */}
+        <div className="absolute top-3 left-3 right-3 z-20 pointer-events-none flex flex-col sm:flex-row sm:items-start justify-between gap-2">
+          <div className="px-4 py-2.5 rounded-[18px] bg-[#FAF9F5] border-2 border-[#D9D6CA] pointer-events-auto text-xs space-y-0.5 max-w-md">
+            <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
+              <span className="w-2 h-2 rounded-full bg-[#D97757] shrink-0" />
+              <span className="font-serif font-medium text-[#141413] text-sm">
+                Top-to-Bottom 3D Flow
               </span>
-              <div>
-                <h4 className="text-sm font-bold text-black dark:text-white">
-                  {activeStage.name}
-                </h4>
-                <span className="text-[10px] text-zinc-500 dark:text-zinc-400">
-                  {activeStage.category}
+              <span className="text-[#5E5D57]">•</span>
+              <span className="font-mono text-[11px] text-[#B5532F] font-semibold truncate max-w-[160px] sm:max-w-none">
+                {programName}
+              </span>
+            </div>
+            <p className="text-[11px] text-[#5E5D57] leading-snug hidden sm:block">
+              Starts at Source Code (top) and finishes at Final Program (bottom). Click any labeled block.
+            </p>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2 pointer-events-auto">
+            {onRunBenchmark && (
+              <button
+                onClick={onRunBenchmark}
+                disabled={isRunning}
+                className={`px-4 py-2 rounded-full font-semibold text-xs transition-opacity cursor-pointer flex items-center space-x-1.5 ${
+                  isRunning
+                    ? 'opacity-60 cursor-not-allowed bg-[#D9D6CA] text-[#5E5D57]'
+                    : 'bg-[#D97757] text-[#141413] hover:opacity-90'
+                }`}
+              >
+                <Play className="w-3 h-3 fill-current" />
+                <span>Run Comparison</span>
+              </button>
+            )}
+
+            <div className="flex items-center p-1 rounded-full bg-[#FAF9F5] border-2 border-[#D9D6CA] text-xs">
+              <button
+                onClick={() => handleViewPreset('overview')}
+                className="px-2.5 py-1 rounded-full text-[#5E5D57] hover:text-[#141413] text-[11px] font-semibold cursor-pointer"
+              >
+                Top-to-Bottom
+              </button>
+              <button
+                onClick={() => handleViewPreset('opt-fork')}
+                className="px-2.5 py-1 rounded-full text-[#5E5D57] hover:text-[#141413] text-[11px] font-semibold cursor-pointer"
+              >
+                Opt Fork
+              </button>
+              <button
+                onClick={() => handleViewPreset('top')}
+                className="px-2.5 py-1 rounded-full text-[#5E5D57] hover:text-[#141413] text-[11px] font-semibold cursor-pointer"
+              >
+                Flat Map
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Live Benchmark Execution Notification */}
+        {isRunning && (
+          <div className="absolute top-28 sm:top-16 left-1/2 -translate-x-1/2 z-30 w-[90%] sm:w-auto flex items-center justify-center space-x-2.5 px-4 py-2 rounded-full bg-[#FAF9F5] border-2 border-[#D97757] text-xs font-mono">
+            <div className="w-2 h-2 rounded-full bg-[#D97757] shrink-0" />
+            <span className="font-semibold text-[#141413] truncate">
+              {benchmarkStep || 'Simultaneously compiling both optimization branches...'}
+            </span>
+          </div>
+        )}
+
+        {/* Bottom Floating Playback Bar */}
+        <div className="absolute bottom-3 sm:bottom-4 left-1/2 -translate-x-1/2 z-20 w-[92%] sm:w-auto flex flex-wrap items-center justify-center gap-x-3 gap-y-1.5 px-4 py-2 rounded-full bg-[#FAF9F5] border-2 border-[#D9D6CA] text-xs font-mono">
+          <button
+            onClick={() => setIsPlaying(!isPlaying)}
+            className="flex items-center space-x-1.5 px-3 py-1 rounded-full bg-[#D97757] text-[#141413] font-semibold hover:opacity-90 transition-opacity cursor-pointer text-[11px]"
+          >
+            {isPlaying ? <Pause className="w-3 h-3 fill-current" /> : <Play className="w-3 h-3 fill-current" />}
+            <span>{isPlaying ? 'Pause' : 'Resume'}</span>
+          </button>
+
+          <span className="text-[#D9D6CA] hidden sm:inline">|</span>
+
+          <div className="flex items-center space-x-1 text-[#5E5D57]">
+            <span>Speed:</span>
+            {[1, 2].map((s) => (
+              <button
+                key={s}
+                onClick={() => setSpeed(s)}
+                className={`px-2 py-0.5 rounded-full text-[10px] cursor-pointer ${
+                  speed === s
+                    ? 'bg-[#141413] text-[#FAF9F5] font-semibold'
+                    : 'hover:text-[#141413]'
+                }`}
+              >
+                {s}x
+              </button>
+            ))}
+          </div>
+
+          <span className="text-[#D9D6CA] hidden sm:inline">|</span>
+
+          <button
+            onClick={handleResetCamera}
+            className="flex items-center space-x-1 text-[#5E5D57] hover:text-[#141413] cursor-pointer text-[11px] font-semibold"
+            title="Reset Camera View"
+          >
+            <RotateCcw className="w-3 h-3" />
+            <span>Reset</span>
+          </button>
+        </div>
+
+        {/* Stage Detail Card */}
+        {activeStage && (
+          <div className="absolute bottom-16 left-1/2 -translate-x-1/2 z-30 w-[92%] max-w-2xl rounded-[24px] bg-[#FAF9F5] border-2 border-[#D9D6CA] p-5 text-xs space-y-3 animate-editorial-in">
+            <div className="flex items-start justify-between border-b-2 border-[#D9D6CA] pb-2.5">
+              <div className="flex items-center space-x-2.5">
+                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-semibold uppercase bg-[#D97757] text-[#141413]">
+                  {activeStage.phaseNumber}
                 </span>
+                <div>
+                  <h4 className="font-serif text-base font-medium text-[#141413]">
+                    {activeStage.name}
+                  </h4>
+                  <span className="text-[11px] text-[#5E5D57]">
+                    {activeStage.category}
+                  </span>
+                </div>
+              </div>
+
+              <button
+                onClick={() => setSelectedStageId(null)}
+                className="w-7 h-7 rounded-full bg-[#F0EEE6] border border-[#D9D6CA] flex items-center justify-center text-[#141413] cursor-pointer"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            </div>
+
+            <p className="text-[#5E5D57] text-xs leading-relaxed">
+              {activeStage.summary}
+            </p>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-[11px]">
+              <div className="p-3 rounded-[16px] bg-[#F0EEE6] border border-[#D9D6CA]">
+                <span className="text-[10px] uppercase font-semibold tracking-[0.08em] text-[#B5532F] block mb-0.5">
+                  Standard Compiler
+                </span>
+                <span className="text-[#141413]">{activeStage.traditionalDetail}</span>
+              </div>
+              <div className="p-3 rounded-[16px] bg-[#F0EEE6] border border-[#D9D6CA]">
+                <span className="text-[10px] uppercase font-semibold tracking-[0.08em] text-[#B5532F] block mb-0.5">
+                  AI-Assisted Approach
+                </span>
+                <span className="text-[#141413]">{activeStage.aiDetail}</span>
               </div>
             </div>
-
-            <button
-              onClick={() => setSelectedStageId(null)}
-              className="w-6 h-6 rounded-full apple-glass-pill flex items-center justify-center text-zinc-400 hover:text-black dark:hover:text-white cursor-pointer transition-colors"
-            >
-              <X className="w-3.5 h-3.5" />
-            </button>
           </div>
-
-          <p className="text-zinc-600 dark:text-zinc-300 text-xs leading-relaxed">
-            {activeStage.summary}
-          </p>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px]">
-            <div className="p-2 rounded-xl bg-black/[0.02] dark:bg-white/[0.03] border border-black/[0.04] dark:border-white/[0.05]">
-              <span className="text-[10px] uppercase font-mono font-bold text-zinc-600 dark:text-zinc-400 block mb-0.5">Standard Compiler</span>
-              <span className="text-zinc-800 dark:text-zinc-200">{activeStage.traditionalDetail}</span>
-            </div>
-            <div className="p-2 rounded-xl bg-black/[0.02] dark:bg-white/[0.03] border border-black/[0.04] dark:border-white/[0.05]">
-              <span className="text-[10px] uppercase font-mono font-bold text-zinc-600 dark:text-zinc-400 block mb-0.5">AI-Assisted Approach</span>
-              <span className="text-zinc-800 dark:text-zinc-200">{activeStage.aiDetail}</span>
-            </div>
-          </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 };

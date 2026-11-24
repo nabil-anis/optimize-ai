@@ -1,90 +1,86 @@
 @import "tailwindcss";
 
+@theme {
+  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-serif: "Source Serif 4", Georgia, Cambria, "Times New Roman", serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
 @layer base {
   :root {
-    --bg-main: #F3F4F6; /* Crisp neutral light canvas */
-    --surface-glass: #FFFFFF;
-    --surface-border: #E5E7EB;
-    --text-primary: #111827;
-    --text-secondary: #4B5563;
-    --accent-titanium: #E5E7EB;
-    --accent-contrast: #000000;
+    --bg-cream: #F0EEE6;
+    --surface-offwhite: #FAF9F5;
+    --ink-dark: #141413;
+    --accent-coral: #D97757;
+    --accent-coral-dark: #B5532F;
+    --muted-on-cream: #5E5D57;
+    --muted-on-dark: #C9C6BA;
+    --border-warm: #D9D6CA;
   }
 
-  .dark {
-    --bg-main: #000000; /* Pure deep OLED black */
-    --surface-glass: rgba(18, 18, 20, 0.85);
-    --surface-border: rgba(255, 255, 255, 0.08);
-    --text-primary: #F5F5F7;
-    --text-secondary: #A1A1AA;
-    --accent-titanium: #1C1C1E;
-    --accent-contrast: #FFFFFF;
+  html {
+    background-color: #F0EEE6;
+    color: #141413;
   }
 
   body {
-    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    background-color: var(--bg-main);
-    color: var(--text-primary);
+    background-color: #F0EEE6;
+    color: #141413;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+
+  h1, h2, h3, .font-serif {
+    font-family: var(--font-serif);
   }
 
   code, pre, .font-mono {
-    font-family: "SF Mono", "JetBrains Mono", ui-monospace, Menlo, Monaco, Consolas, monospace;
+    font-family: var(--font-mono);
   }
 }
 
-/* Apple-style frosted surfaces */
-.apple-glass {
-  background: #FFFFFF;
-  border: 1px solid #E5E7EB;
-  box-shadow: 0 4px 14px -2px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.03);
+/* Editorial typography helpers */
+.font-serif-display {
+  font-family: var(--font-serif);
+  font-weight: 500;
+  line-height: 1.05;
+  letter-spacing: -0.028em;
 }
 
-.dark .apple-glass {
-  background: rgba(18, 18, 20, 0.78);
-  backdrop-filter: blur(28px) saturate(180%);
-  -webkit-backdrop-filter: blur(28px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+/* Claude-style warm cards */
+.editorial-card {
+  background-color: #FAF9F5;
+  border: 2px solid #D9D6CA;
+  border-radius: 24px;
+  transition: transform 220ms cubic-bezier(0.22, 1, 0.36, 1), border-color 220ms ease;
 }
 
-.apple-glass-pill {
-  background: #F3F4F6;
-  border: 1px solid #E5E7EB;
-  color: #111827;
+.editorial-card-lift:hover {
+  transform: translateY(-2px);
 }
 
-.dark .apple-glass-pill {
-  background: rgba(255, 255, 255, 0.06);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: #F5F5F7;
+.editorial-well {
+  background-color: #F0EEE6;
+  border: 2px solid #D9D6CA;
+  border-radius: 18px;
 }
 
-/* Well / Secondary container */
-.apple-well {
-  background: #F9FAFB;
-  border: 1px solid #E5E7EB;
+/* Subtle entrance motion (no bounce, no flash) */
+@keyframes fadeSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-.dark .apple-well {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-}
-
-/* Code container */
-.apple-code-box {
-  background: #F9FAFB;
-  border: 1px solid #E5E7EB;
-  color: #111827;
-}
-
-.dark .apple-code-box {
-  background: rgba(0, 0, 0, 0.4);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  color: #E8E9EC;
+.animate-editorial-in {
+  animation: fadeSlideUp 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 /* 3D Flip Card Preservation */
@@ -105,10 +101,10 @@
   transform: rotateY(180deg);
 }
 
-/* Subtle Apple minimalist scrollbar */
+/* Minimal warm scrollbar */
 ::-webkit-scrollbar {
-  width: 5px;
-  height: 5px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
@@ -116,10 +112,10 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(140, 140, 145, 0.3);
+  background: #D9D6CA;
   border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(140, 140, 145, 0.5);
+  background: #5E5D57;
 }

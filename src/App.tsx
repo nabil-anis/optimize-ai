@@ -24,21 +24,19 @@ import {
   Cpu,
   AlertCircle,
   Play,
-  RotateCcw,
   Sparkles
 } from 'lucide-react';
 
 export default function App() {
-  // Permanently enforce Dark Mode
+  // Ensure any stale dark class is cleared on load
   useEffect(() => {
-    document.documentElement.classList.add('dark');
-    localStorage.setItem('compiler_lab_theme', 'dark');
+    document.documentElement.classList.remove('dark');
   }, []);
 
-  // Active navigation tab — default to the Dual Compilers Lab hero view!
+  // Active navigation tab — default to the Dual Compilers Lab hero view
   const [activeTab, setActiveTab] = useState<ActiveTab>('lab');
 
-  // Studio layout sub-mode: allows viewing 3D pipeline + code side-by-side/stacked
+  // Studio layout sub-mode
   const [studioViewMode, setStudioViewMode] = useState<'with-3d' | 'compact'>('with-3d');
 
   // System status
@@ -115,7 +113,7 @@ export default function App() {
     loadHistory();
   }, [loadSystemStatus, loadHistory]);
 
-  // Benchmark Execution Function (Live Backend compilation with Clang & opt)
+  // Benchmark Execution Function (Live Backend compilation)
   const handleRunBenchmark = async () => {
     if (isRunning || !code.trim()) return;
 
@@ -196,14 +194,8 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col font-sans transition-colors duration-300 relative overflow-x-hidden selection:bg-black/10 dark:selection:bg-white/20 bg-[#F3F4F6] dark:bg-black text-zinc-950 dark:text-[#F5F5F7]">
-      {/* Subtle Apple ambient background glows */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
-        <div className="absolute -top-40 left-1/2 -translate-x-1/2 w-[800px] h-[500px] bg-black/[0.02] dark:bg-white/[0.03] rounded-full blur-3xl" />
-        <div className="absolute top-1/3 -right-40 w-[600px] h-[600px] bg-black/[0.015] dark:bg-white/[0.02] rounded-full blur-3xl" />
-      </div>
-
-      {/* Apple Floating Glass Navigation Bar */}
+    <div className="min-h-screen flex flex-col font-sans bg-[#F0EEE6] text-[#141413] overflow-x-hidden selection:bg-[#D97757]/25">
+      {/* Warm Cream Navigation Bar */}
       <Navbar
         activeTab={activeTab}
         setActiveTab={setActiveTab}
@@ -212,7 +204,7 @@ export default function App() {
       />
 
       {/* Main View Area */}
-      <main className="relative z-10 flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-5">
+      <main className="flex-1 w-full max-w-[1680px] mx-auto px-4 sm:px-6 lg:px-10 py-6 sm:py-10">
         {/* TAB 0: HERO LAB — PROBLEM, SOLUTION & DUAL COMPILERS SIDE-BY-SIDE */}
         {activeTab === 'lab' && (
           <DualCompilerLabView
@@ -236,28 +228,27 @@ export default function App() {
           />
         )}
 
-        {/* TAB 1: LIVE 3D VISUAL PIPELINE (HERO EXPERIENCE) */}
+        {/* TAB 1: LIVE 3D VISUAL PIPELINE */}
         {activeTab === '3d-pipeline' && (
-          <div className="space-y-6">
-            {/* Header info */}
-            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 border-b border-black/[0.06] dark:border-white/[0.08] pb-3">
-              <div>
-                <span className="text-xs uppercase font-mono tracking-wider font-semibold text-zinc-600 dark:text-zinc-400">
+          <div className="space-y-8 animate-editorial-in">
+            {/* Editorial Header */}
+            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b-2 border-[#D9D6CA] pb-5">
+              <div className="space-y-2">
+                <span className="text-xs uppercase font-semibold tracking-[0.08em] text-[#B5532F] block">
                   Interactive 3D Diagram
                 </span>
-                <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#1D1D1F] dark:text-[#F5F5F7]">
-                  Live 3D Optimization Flow
+                <h1 className="font-serif-display text-3xl sm:text-5xl text-[#141413]">
+                  Watch the compiler think
                 </h1>
-                <p className="text-xs sm:text-sm text-zinc-600 dark:text-zinc-400 mt-0.5">
-                  Watch how your code travels through a standard compiler versus an AI-guided compiler in real time.
+                <p className="text-sm sm:text-base text-[#5E5D57] max-w-xl">
+                  See your code travel through a standard checklist alongside an AI-guided path.
                 </p>
               </div>
 
-              {/* Action buttons */}
-              <div className="flex items-center space-x-2">
+              <div className="flex flex-wrap items-center gap-2.5">
                 <button
                   onClick={() => setActiveTab('workspace')}
-                  className="px-3.5 py-1.5 rounded-xl apple-glass-pill text-xs font-semibold text-black dark:text-white hover:opacity-90 transition-all cursor-pointer shadow-sm flex items-center space-x-1.5"
+                  className="px-4 py-2 rounded-full border-2 border-[#141413] text-xs font-semibold text-[#141413] hover:bg-[#FAF9F5] transition-colors cursor-pointer flex items-center space-x-1.5"
                 >
                   <Cpu className="w-3.5 h-3.5" />
                   <span>Open Studio</span>
@@ -266,19 +257,112 @@ export default function App() {
                 <button
                   onClick={handleRunBenchmark}
                   disabled={isRunning}
-                  className={`px-4 py-1.5 rounded-xl text-xs font-bold shadow-md transition-all cursor-pointer flex items-center space-x-1.5 ${
+                  className={`px-5 py-2.5 rounded-full text-xs font-semibold transition-opacity cursor-pointer flex items-center space-x-1.5 ${
                     isRunning
-                      ? 'opacity-60 cursor-not-allowed bg-zinc-300 dark:bg-zinc-800 text-zinc-500'
-                      : 'bg-black dark:bg-white text-white dark:text-black hover:opacity-90 active:scale-95'
+                      ? 'opacity-60 cursor-not-allowed bg-[#D9D6CA] text-[#5E5D57]'
+                      : 'bg-[#D97757] text-[#141413] hover:opacity-90'
                   }`}
                 >
                   <Play className="w-3.5 h-3.5 fill-current" />
-                  <span>Run Comparison ⌘↵</span>
+                  <span>Run Comparison</span>
                 </button>
               </div>
             </div>
 
-            {/* The Live Visual 3D Pipeline Diagram Canvas */}
+            {/* Classic Textbook Compiler Inspiration Blueprint (Top-to-Bottom Reference) */}
+            <section className="p-5 sm:p-8 editorial-card space-y-6">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b-2 border-[#D9D6CA] pb-4">
+                <div>
+                  <span className="text-[11px] uppercase font-semibold tracking-[0.08em] text-[#B5532F] block">
+                    Reference Diagram (What the 3D Scene Represents)
+                  </span>
+                  <h2 className="font-serif text-2xl sm:text-3xl font-medium text-[#141413] mt-0.5">
+                    The Classic 6-Phase Compiler Flow (Top to Bottom)
+                  </h2>
+                </div>
+                <span className="text-xs font-mono font-semibold text-[#5E5D57]">
+                  Start at top • Finish at bottom
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch text-xs">
+                {/* Left Column: Variable Table (Symbol Table) */}
+                <div className="lg:col-span-3 order-2 lg:order-1 rounded-[20px] bg-[#F0EEE6] border-2 border-[#D9D6CA] p-5 flex flex-col items-center justify-center text-center space-y-2">
+                  <span className="text-[10.5px] uppercase font-semibold tracking-[0.08em] text-[#B5532F]">
+                    Connected Left Tower
+                  </span>
+                  <h3 className="font-serif text-xl font-medium text-[#141413]">
+                    Variable Table
+                  </h3>
+                  <p className="text-xs text-[#5E5D57] leading-relaxed">
+                    Tracks every variable name, type, and scope across all 6 phases.
+                  </p>
+                </div>
+
+                {/* Center Column: Top-to-Bottom Flowchart */}
+                <div className="lg:col-span-6 order-1 lg:order-2 flex flex-col items-center space-y-1.5">
+                  <div className="px-4 py-1.5 rounded-full bg-[#141413] text-[#FAF9F5] font-mono text-[11px] font-semibold">
+                    START: Source Code Input
+                  </div>
+                  <span className="text-[#B5532F] font-bold text-xs">↓</span>
+
+                  {[
+                    { num: '1', name: 'Lexical Analysis (Scanner)', note: 'Words & symbols' },
+                    { num: '2', name: 'Syntax Analysis (Parser)', note: 'Grammar tree' },
+                    { num: '3', name: 'Semantic Analysis', note: 'Type rules' },
+                    { num: '4', name: 'Intermediate Code Generation', note: 'Universal blueprint' },
+                  ].map((phase) => (
+                    <React.Fragment key={phase.num}>
+                      <div className="w-full max-w-md px-4 py-2.5 rounded-full bg-[#F0EEE6] border-2 border-[#D9D6CA] flex items-center justify-between gap-2">
+                        <span className="font-mono font-semibold text-[#B5532F]">{phase.num}.</span>
+                        <span className="font-semibold text-[#141413] text-center flex-1">{phase.name}</span>
+                        <span className="text-[11px] text-[#5E5D57] hidden sm:inline">{phase.note}</span>
+                      </div>
+                      <span className="text-[#B5532F] font-bold text-xs">↓</span>
+                    </React.Fragment>
+                  ))}
+
+                  {/* Phase 5 Optimization Fork */}
+                  <div className="w-full max-w-md grid grid-cols-2 gap-2.5">
+                    <div className="px-3 py-2.5 rounded-[16px] bg-[#F0EEE6] border-2 border-[#D9D6CA] text-center">
+                      <span className="font-mono text-[10px] font-semibold text-[#5E5D57] block">5A. NORMAL (-O2)</span>
+                      <span className="font-semibold text-[#141413] text-[11px]">Code Optimization</span>
+                    </div>
+                    <div className="px-3 py-2.5 rounded-[16px] bg-[#D97757] border-2 border-[#141413] text-center">
+                      <span className="font-mono text-[10px] font-semibold text-[#141413] block">5B. AI-GUIDED</span>
+                      <span className="font-semibold text-[#141413] text-[11px]">Code Optimization</span>
+                    </div>
+                  </div>
+                  <span className="text-[#B5532F] font-bold text-xs">↓</span>
+
+                  <div className="w-full max-w-md px-4 py-2.5 rounded-full bg-[#F0EEE6] border-2 border-[#D9D6CA] flex items-center justify-between gap-2">
+                    <span className="font-mono font-semibold text-[#B5532F]">6.</span>
+                    <span className="font-semibold text-[#141413] text-center flex-1">Target Code Generation</span>
+                    <span className="text-[11px] text-[#5E5D57] hidden sm:inline">CPU instructions</span>
+                  </div>
+                  <span className="text-[#B5532F] font-bold text-xs">↓</span>
+
+                  <div className="px-4 py-1.5 rounded-full bg-[#141413] text-[#FAF9F5] font-mono text-[11px] font-semibold">
+                    END: Final Runnable Program
+                  </div>
+                </div>
+
+                {/* Right Column: Error Checker */}
+                <div className="lg:col-span-3 order-3 rounded-[20px] bg-[#F0EEE6] border-2 border-[#D9D6CA] p-5 flex flex-col items-center justify-center text-center space-y-2">
+                  <span className="text-[10.5px] uppercase font-semibold tracking-[0.08em] text-[#B5532F]">
+                    Connected Right Tower
+                  </span>
+                  <h3 className="font-serif text-xl font-medium text-[#141413]">
+                    Error Checker
+                  </h3>
+                  <p className="text-xs text-[#5E5D57] leading-relaxed">
+                    Watches all 6 phases to catch typos, grammar bugs, and unsafe optimizations.
+                  </p>
+                </div>
+              </div>
+            </section>
+
+            {/* Live Visual 3D Pipeline Diagram Canvas */}
             <ThreePipelineDiagram
               isDark={true}
               isRunning={isRunning}
@@ -287,36 +371,36 @@ export default function App() {
               onRunBenchmark={handleRunBenchmark}
               programName={programName}
               onOpenStudio={() => setActiveTab('workspace')}
-              heightClass="h-[520px] sm:h-[740px]"
+              heightClass="h-[560px] sm:h-[760px]"
             />
 
-            {/* Micro Feature Explanations */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
-              <div className="p-4 rounded-2xl apple-glass space-y-1">
-                <span className="font-mono font-semibold text-[#1D1D1F] dark:text-[#F5F5F7] text-[11px] block">
-                  Track A: Standard Compiler (-O2)
+            {/* Three Short Idea Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+              <div className="p-6 editorial-card editorial-card-lift space-y-2">
+                <span className="text-[11px] uppercase font-semibold tracking-[0.08em] text-[#B5532F] block">
+                  Track A • Standard (-O2)
                 </span>
-                <p className="text-zinc-600 dark:text-zinc-400 text-[11px] leading-relaxed">
-                  Runs a fixed checklist of ~120 cleanup steps in the same order for every program, even when most steps are unnecessary.
+                <p className="text-sm text-[#5E5D57] leading-relaxed">
+                  Runs a fixed checklist of ~120 cleanup steps in the exact same order for every program.
                 </p>
               </div>
 
-              <div className="p-4 rounded-2xl apple-glass space-y-1">
-                <span className="font-mono font-semibold text-[#1D1D1F] dark:text-[#F5F5F7] text-[11px] block flex items-center">
-                  <Sparkles className="w-3 h-3 mr-1" />
-                  Track B: AI-Guided Compiler
+              <div className="p-6 editorial-card editorial-card-lift space-y-2">
+                <span className="text-[11px] uppercase font-semibold tracking-[0.08em] text-[#B5532F] flex items-center gap-1.5">
+                  <Sparkles className="w-3.5 h-3.5" />
+                  Track B • AI-Guided
                 </span>
-                <p className="text-zinc-600 dark:text-zinc-400 text-[11px] leading-relaxed">
-                  Inspects the program structure first, then picks only the handful of speedup steps that actually make this code faster.
+                <p className="text-sm text-[#5E5D57] leading-relaxed">
+                  Reads the code blueprint first, then selects only the handful of tools that help.
                 </p>
               </div>
 
-              <div className="p-4 rounded-2xl apple-glass space-y-1">
-                <span className="font-mono font-semibold text-[#1D1D1F] dark:text-[#F5F5F7] text-[11px] block">
-                  Click Any Stage to Explore
+              <div className="p-6 editorial-card editorial-card-lift space-y-2">
+                <span className="text-[11px] uppercase font-semibold tracking-[0.08em] text-[#B5532F] block">
+                  Explore Nodes
                 </span>
-                <p className="text-zinc-600 dark:text-zinc-400 text-[11px] leading-relaxed">
-                  Click any 3D block in the diagram to see what happens at that step and how the standard and AI approaches differ.
+                <p className="text-sm text-[#5E5D57] leading-relaxed">
+                  Click any stage block in the 3D scene to inspect how each phase transforms your code.
                 </p>
               </div>
             </div>
@@ -325,29 +409,29 @@ export default function App() {
 
         {/* TAB 2: STUDIO (CODE EDITOR + 3D PIPELINE + COMPARISON CARDS) */}
         {activeTab === 'workspace' && (
-          <div className="space-y-6">
-            {/* Studio Header with View Mode Switcher */}
-            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 border-b border-black/[0.06] dark:border-white/[0.08] pb-3">
-              <div>
-                <span className="text-xs uppercase font-mono tracking-wider font-semibold text-zinc-500 dark:text-zinc-400">
+          <div className="space-y-8 animate-editorial-in">
+            {/* Studio Header */}
+            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b-2 border-[#D9D6CA] pb-5">
+              <div className="space-y-2">
+                <span className="text-xs uppercase font-semibold tracking-[0.08em] text-[#B5532F] block">
                   Benchmarking Laboratory
                 </span>
-                <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#1D1D1F] dark:text-[#F5F5F7]">
+                <h1 className="font-serif-display text-3xl sm:text-5xl text-[#141413]">
                   Compiler Studio
                 </h1>
-                <p className="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400 mt-0.5">
-                  Measure. Optimize. Compare.
+                <p className="text-sm sm:text-base text-[#5E5D57]">
+                  Edit your C or C++ code, pick manual tools or AI guidance, and measure every run.
                 </p>
               </div>
 
-              {/* Segmented layout switcher: With 3D Diagram vs Compact Code */}
-              <div className="flex items-center space-x-1 p-1 rounded-xl apple-glass-pill text-xs">
+              {/* Pill Switcher */}
+              <div className="flex items-center space-x-1 p-1.5 rounded-full bg-[#FAF9F5] border-2 border-[#D9D6CA] text-xs self-start sm:self-auto">
                 <button
                   onClick={() => setStudioViewMode('with-3d')}
-                  className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg font-medium transition-all cursor-pointer ${
+                  className={`flex items-center space-x-1.5 px-3.5 py-1.5 rounded-full font-semibold transition-colors cursor-pointer ${
                     studioViewMode === 'with-3d'
-                      ? 'bg-black dark:bg-white text-white dark:text-black font-semibold shadow-sm'
-                      : 'text-zinc-500 dark:text-zinc-400 hover:text-black dark:hover:text-white'
+                      ? 'bg-[#D97757] text-[#141413]'
+                      : 'text-[#5E5D57] hover:text-[#141413]'
                   }`}
                 >
                   <Box className="w-3.5 h-3.5" />
@@ -356,10 +440,10 @@ export default function App() {
 
                 <button
                   onClick={() => setStudioViewMode('compact')}
-                  className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg font-medium transition-all cursor-pointer ${
+                  className={`flex items-center space-x-1.5 px-3.5 py-1.5 rounded-full font-semibold transition-colors cursor-pointer ${
                     studioViewMode === 'compact'
-                      ? 'bg-black dark:bg-white text-white dark:text-black font-semibold shadow-sm'
-                      : 'text-zinc-500 dark:text-zinc-400 hover:text-black dark:hover:text-white'
+                      ? 'bg-[#D97757] text-[#141413]'
+                      : 'text-[#5E5D57] hover:text-[#141413]'
                   }`}
                 >
                   <Cpu className="w-3.5 h-3.5" />
@@ -368,19 +452,18 @@ export default function App() {
               </div>
             </div>
 
-            {/* Embedded Live 3D Pipeline Diagram (When in 'with-3d' mode) */}
             {studioViewMode === 'with-3d' && (
-              <div className="space-y-2">
-                <div className="flex items-center justify-between text-xs font-mono text-zinc-500 dark:text-zinc-400 px-1">
-                  <span className="flex items-center space-x-1.5 font-semibold text-black dark:text-white">
-                    <Box className="w-3.5 h-3.5" />
-                    <span>Live Physical Pipeline Diagram</span>
+              <div className="space-y-3">
+                <div className="flex items-center justify-between text-xs px-1">
+                  <span className="flex items-center space-x-2 font-semibold text-[#141413]">
+                    <Box className="w-3.5 h-3.5 text-[#B5532F]" />
+                    <span>Live Pipeline Diagram</span>
                   </span>
                   <button
                     onClick={() => setActiveTab('3d-pipeline')}
-                    className="hover:text-black dark:hover:text-white hover:underline cursor-pointer"
+                    className="font-semibold text-[#B5532F] hover:underline cursor-pointer"
                   >
-                    Expand to Full 3D Canvas ↗
+                    Expand to Full 3D View
                   </button>
                 </div>
                 <ThreePipelineDiagram
@@ -395,7 +478,6 @@ export default function App() {
               </div>
             )}
 
-            {/* Xcode-Style Minimalist Code Editor */}
             <CodeEditor
               code={code}
               setCode={setCode}
@@ -418,30 +500,29 @@ export default function App() {
               benchmarkStep={benchmarkStep}
             />
 
-            {/* Error Banner if any */}
             {errorMessage && (
-              <div className="p-4 rounded-2xl bg-zinc-800 text-zinc-200 border border-zinc-700 text-xs flex items-start space-x-3 shadow-sm">
-                <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-zinc-400" />
+              <div className="p-5 rounded-[24px] bg-[#141413] text-[#FAF9F5] border-2 border-[#D97757] text-xs flex items-start space-x-3">
+                <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-[#D97757]" />
                 <div className="flex-1 space-y-1">
-                  <span className="font-semibold block text-white">Test Run Error</span>
-                  <pre className="font-mono text-[11px] whitespace-pre-wrap text-zinc-300">{errorMessage}</pre>
+                  <span className="font-semibold block text-[#D97757] uppercase tracking-[0.08em] text-[11px]">
+                    Test Run Error
+                  </span>
+                  <pre className="font-mono text-xs whitespace-pre-wrap text-[#C9C6BA]">{errorMessage}</pre>
                 </div>
               </div>
             )}
 
-            {/* Side-by-Side Apple Compiler Comparison Cards */}
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <h2 className="text-sm font-semibold tracking-tight text-[#1D1D1F] dark:text-[#F5F5F7]">
-                  Compiler Optimization Comparison
+            <div className="space-y-4">
+              <div className="flex flex-wrap items-baseline justify-between gap-2">
+                <h2 className="font-serif text-2xl sm:text-3xl font-medium tracking-tight text-[#141413]">
+                  Side-by-Side Comparison
                 </h2>
-                <span className="text-[11px] text-zinc-600 dark:text-zinc-400">
-                  Side-by-side speed test averaged over {iterations} runs
+                <span className="text-xs text-[#5E5D57]">
+                  Averaged over {iterations} runs
                 </span>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                {/* COMPILER A: Traditional Clang / LLVM */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <CompilerCard
                   type="traditional"
                   title="Standard Compiler"
@@ -461,7 +542,6 @@ export default function App() {
                   onNavigateTo3D={() => setActiveTab('3d-pipeline')}
                 />
 
-                {/* COMPILER B: AI-Assisted Compiler */}
                 <CompilerCard
                   type="llm"
                   title="AI-Assisted Compiler"
@@ -483,7 +563,6 @@ export default function App() {
               </div>
             </div>
 
-            {/* Executive Results Dashboard */}
             {currentResult && (
               <div className="pt-2">
                 <ResultsDashboard
@@ -587,15 +666,19 @@ export default function App() {
         {activeTab === 'theory' && <TheoryView />}
       </main>
 
-      {/* Floating Apple Glass Footer */}
-      <footer className="relative z-10 border-t border-black/[0.06] dark:border-white/[0.05] py-4 text-center text-xs font-mono text-zinc-600 dark:text-zinc-400">
-        <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
-          <span>Compiler Optimization Lab • Standard vs. AI Code Speedup</span>
-          <span>Side-by-Side Speed Testing • Automatic Output Verification</span>
+      {/* Warm Editorial Footer */}
+      <footer className="border-t-2 border-[#D9D6CA] bg-[#F0EEE6] py-6 text-xs text-[#5E5D57]">
+        <div className="w-full max-w-[1680px] mx-auto px-4 sm:px-6 lg:px-10 flex flex-col sm:flex-row items-center justify-between gap-2">
+          <span className="font-serif text-sm text-[#141413]">
+            Compiler Optimization Lab
+          </span>
+          <span className="text-xs text-[#5E5D57]">
+            Standard vs. AI Code Speedup • Side-by-Side Speed Testing
+          </span>
         </div>
       </footer>
 
-      {/* LLVM IR Inspector Modal */}
+      {/* Code Blueprint Inspector Modal */}
       {irModal.isOpen && (
         <IrViewerModal
           isOpen={irModal.isOpen}
