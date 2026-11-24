@@ -116,9 +116,9 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
   return (
     <div className="w-full rounded-3xl apple-glass overflow-hidden transition-all shadow-sm">
       {/* Apple Developer Minimalist Toolbar */}
-      <div className="px-4 py-2.5 border-b border-black/[0.05] dark:border-white/[0.06] flex flex-wrap items-center justify-between gap-3 bg-white/40 dark:bg-black/20">
+      <div className="px-3 sm:px-4 py-2.5 border-b border-black/[0.05] dark:border-white/[0.06] flex flex-col sm:flex-row sm:flex-wrap items-stretch sm:items-center justify-between gap-2.5 sm:gap-3 bg-white/40 dark:bg-black/20">
         {/* Left: Sample Selector & Language */}
-        <div className="flex items-center space-x-2 flex-wrap">
+        <div className="flex items-center gap-2 flex-wrap">
           {/* Sample Selector */}
           <div className="relative">
             <select
@@ -126,7 +126,7 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
               defaultValue="matrix-mult"
               className="appearance-none text-xs font-medium pl-3 pr-7 py-1.5 rounded-xl apple-glass-pill text-[#1D1D1F] dark:text-[#F5F5F7] focus:outline-none cursor-pointer"
             >
-              <option disabled value="">Choose benchmark...</option>
+              <option disabled value="">Choose a sample program...</option>
               {CODE_SAMPLES.map((sample) => (
                 <option key={sample.id} value={sample.id} className="bg-white dark:bg-zinc-900">
                   {sample.title}
@@ -167,16 +167,16 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
               onChange={(e) => setBaselinePreset(e.target.value)}
               className="appearance-none text-xs font-mono font-medium px-2.5 py-1.5 rounded-xl apple-glass-pill text-[#1D1D1F] dark:text-[#F5F5F7] cursor-pointer"
             >
-              <option value="-O2" className="bg-white dark:bg-zinc-900">Baseline: -O2</option>
-              <option value="-O3" className="bg-white dark:bg-zinc-900">Baseline: -O3</option>
-              <option value="-Oz" className="bg-white dark:bg-zinc-900">Baseline: -Oz (Size)</option>
-              <option value="-O1" className="bg-white dark:bg-zinc-900">Baseline: -O1</option>
+              <option value="-O2" className="bg-white dark:bg-zinc-900">Standard: -O2 (Default)</option>
+              <option value="-O3" className="bg-white dark:bg-zinc-900">Standard: -O3 (Aggressive)</option>
+              <option value="-Oz" className="bg-white dark:bg-zinc-900">Standard: -Oz (Small Size)</option>
+              <option value="-O1" className="bg-white dark:bg-zinc-900">Standard: -O1 (Light)</option>
             </select>
           </div>
         </div>
 
         {/* Right: Mode Switcher, Config, Actions, Run Button */}
-        <div className="flex items-center space-x-2">
+        <div className="flex flex-wrap items-center justify-between sm:justify-end gap-2 w-full sm:w-auto">
           {/* Optimization Mode Toggle */}
           <div className="flex items-center p-0.5 rounded-xl apple-glass-pill text-xs">
             <button
@@ -202,7 +202,7 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
               }`}
             >
               <Sliders className="w-3 h-3" />
-              <span>Passes ({manualPasses.length})</span>
+              <span>Manual Tools ({manualPasses.length})</span>
             </button>
           </div>
 
@@ -212,7 +212,7 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
             className={`p-1.5 rounded-xl apple-glass-pill text-zinc-600 dark:text-zinc-300 hover:text-black dark:hover:text-white transition-all cursor-pointer ${
               showConfigDrawer ? 'ring-1 ring-black/20 dark:ring-white/30' : ''
             }`}
-            title="Configure Pass Sequence & Directives"
+            title="Customize AI instructions or pick speedup tools manually"
           >
             <SlidersHorizontal className="w-3.5 h-3.5" />
           </button>
@@ -258,7 +258,7 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
           <button
             onClick={onRunBenchmark}
             disabled={isRunning || !code.trim()}
-            className={`flex items-center space-x-1.5 px-4 py-1.5 rounded-xl text-xs font-bold tracking-tight shadow-md transition-all cursor-pointer ${
+            className={`w-full sm:w-auto justify-center flex items-center space-x-1.5 px-4 py-1.5 rounded-xl text-xs font-bold tracking-tight shadow-md transition-all cursor-pointer ${
               isRunning || !code.trim()
                 ? 'opacity-50 cursor-not-allowed bg-zinc-300 dark:bg-zinc-800 text-zinc-500'
                 : 'bg-black dark:bg-white text-white dark:text-black hover:bg-zinc-800 dark:hover:bg-zinc-200 active:scale-95 shadow-sm'
@@ -285,11 +285,12 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
         <div className="px-5 py-3.5 border-b border-black/[0.05] dark:border-white/[0.06] bg-black/[0.02] dark:bg-white/[0.02] space-y-3 text-xs">
           <div className="flex items-center justify-between">
             <span className="font-semibold text-xs tracking-tight text-[#1D1D1F] dark:text-[#F5F5F7]">
-              {isManualPassMode ? 'Custom LLVM Pass Pipeline Configuration' : 'AI Optimization Directive'}
+              {isManualPassMode ? 'Pick Speedup Tools Manually' : 'Custom Instructions for AI'}
             </span>
             <button
               onClick={() => setShowConfigDrawer(false)}
-              className="text-zinc-400 hover:text-black dark:hover:text-white cursor-pointer"
+              title="Close options"
+              className="text-zinc-500 hover:text-black dark:hover:text-white cursor-pointer"
             >
               <X className="w-3.5 h-3.5" />
             </button>
@@ -302,11 +303,11 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
                 type="text"
                 value={customPrompt}
                 onChange={(e) => setCustomPrompt(e.target.value)}
-                placeholder="Custom instruction for Gemini (e.g. Focus on SIMD vectorization and unrolling)..."
-                className="w-full text-xs bg-transparent border-b border-black/10 dark:border-white/10 pb-1 focus:outline-none text-[#1D1D1F] dark:text-[#F5F5F7] placeholder:text-zinc-400"
+                placeholder="Optional hint for the AI (e.g. Prioritize faster loops or smaller file size)..."
+                className="w-full text-xs bg-transparent border-b border-black/10 dark:border-white/10 pb-1 focus:outline-none text-[#1D1D1F] dark:text-[#F5F5F7] placeholder:text-zinc-500"
               />
               {customPrompt && (
-                <button onClick={() => setCustomPrompt('')} className="text-[10px] text-zinc-400 hover:text-black dark:hover:text-white">
+                <button onClick={() => setCustomPrompt('')} className="text-[10px] text-zinc-500 hover:text-black dark:hover:text-white">
                   Clear
                 </button>
               )}
@@ -314,7 +315,7 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
           ) : (
             <div className="space-y-2">
               <div className="flex flex-wrap items-center gap-1.5 font-mono text-[11px]">
-                <span className="text-[10px] uppercase text-zinc-400 mr-1">Active Passes:</span>
+                <span className="text-[10px] uppercase text-zinc-600 dark:text-zinc-400 mr-1">Selected Tools:</span>
                 {[
                   'mem2reg', 'sroa', 'instcombine', 'simplifycfg', 'early-cse',
                   'loop-rotate', 'licm', 'loop-unroll', 'loop-vectorize', 'slp-vectorizer',
@@ -350,7 +351,7 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
       {/* Code Editor Body */}
       <div className="relative flex font-mono text-xs overflow-hidden h-[300px]">
         {/* Line Numbers Gutter */}
-        <div className="select-none py-3 pl-3 pr-2 w-11 text-right bg-black/[0.02] dark:bg-black/[0.3] border-r border-black/[0.04] dark:border-white/[0.05] text-zinc-400/60 overflow-hidden shrink-0">
+        <div className="select-none py-3 pl-2 sm:pl-3 pr-2 w-9 sm:w-11 text-right bg-black/[0.02] dark:bg-black/[0.3] border-r border-black/[0.04] dark:border-white/[0.05] text-zinc-400/60 overflow-hidden shrink-0">
           {lineNumbers.map((num) => (
             <div key={num} className="leading-6 h-6">
               {num}
@@ -369,11 +370,11 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
       </div>
 
       {/* Editor Status Bar */}
-      <div className="px-4 py-1.5 border-t border-black/[0.04] dark:border-white/[0.05] bg-black/[0.01] dark:bg-white/[0.01] flex items-center justify-between text-[11px] font-mono text-zinc-500 dark:text-zinc-400">
+      <div className="px-3 sm:px-4 py-1.5 border-t border-black/[0.04] dark:border-white/[0.05] bg-black/[0.01] dark:bg-white/[0.01] flex flex-wrap items-center justify-between gap-2 text-[11px] font-mono text-zinc-500 dark:text-zinc-400">
         <div className="flex items-center space-x-3">
           <span>{lineCount} lines</span>
           <span>•</span>
-          <span>Target: LLVM IR Clang 14.0.6</span>
+          <span>Compiler: Standard C / C++</span>
         </div>
         <div className="flex items-center space-x-2">
           <span>{language === 'cpp' ? 'C++17' : 'C99 / C11'}</span>

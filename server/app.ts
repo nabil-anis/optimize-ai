@@ -72,7 +72,8 @@ app.post(['/api/benchmark/run', '/benchmark/run'], async (req, res) => {
       workDir,
       baselinePreset,
       code,
-      programName
+      programName,
+      unoptIrResult.durationMs
     );
     if (!traditionalComp.success || !traditionalComp.executablePath) {
       return res.status(400).json({
@@ -120,7 +121,9 @@ app.post(['/api/benchmark/run', '/benchmark/run'], async (req, res) => {
       isCpp,
       workDir,
       code,
-      programName
+      programName,
+      sourceFilePath,
+      unoptIrResult.durationMs
     );
 
     if (!llmComp.success || !llmComp.executablePath) {
@@ -130,12 +133,26 @@ app.post(['/api/benchmark/run', '/benchmark/run'], async (req, res) => {
       });
     }
 
-    // Step E: Benchmark both executables with real iterations
+    // Step E: Benchmark both executables sequentially so they don't compete for CPU cores
     const numIterations = Math.max(1, Math.min(iterations || 5, 20));
-    const [traditionalBenchmark, llmBenchmark] = await Promise.all([
-      compilerService.benchmarkExecutable(traditionalComp.executablePath, numIterations, '', code, programName),
-      compilerService.benchmarkExecutable(llmComp.executablePath, numIterations, '', code, programName),
-    ]);
+    const traditionalBenchmark = await compilerService.benchmarkExecutable(
+      traditionalComp.executablePath,
+      numIterations,
+      '',
+      code,
+      programName,
+      baselinePreset,
+      []
+    );
+    const llmBenchmark = await compilerService.benchmarkExecutable(
+      llmComp.executablePath,
+      numIterations,
+      '',
+      code,
+      programName,
+      baselinePreset,
+      passesToApply
+    );
 
     // Step F: Correctness Verification
     const correctnessVerified =

@@ -45,100 +45,100 @@ const COMPILER_STAGES: Record<string, StageMeta> = {
     name: '1. Lexical Analysis (Scanner)',
     phaseNumber: 1,
     category: 'Word Scanning',
-    summary: 'Reads characters and groups them into meaningful code words (tokens) like variables, numbers, and operators.',
-    role: 'Strips comments, spaces, and identifies individual words.',
-    traditionalDetail: 'Clang lexer generates token stream.',
-    aiDetail: 'Deterministic word scanning.',
+    summary: 'Reads characters and groups them into meaningful words like variable names, numbers, and math symbols.',
+    role: 'Ignores comments and blank spaces to isolate individual code words.',
+    traditionalDetail: 'Scans text into a stream of words.',
+    aiDetail: 'Identical first step for both compilers.',
   },
   'syntax': {
     id: 'syntax',
     name: '2. Syntax Analysis (Parser)',
     phaseNumber: 2,
-    category: 'Grammar Tree',
-    summary: 'Validates programming grammar rules and arranges tokens into an Abstract Syntax Tree (AST).',
-    role: 'Constructs the logical tree hierarchy of loops and expressions.',
-    traditionalDetail: 'Clang parser builds AST.',
-    aiDetail: 'Shared syntax tree verification.',
+    category: 'Structure Tree',
+    summary: 'Checks that the code follows grammar rules and organizes it into a tree of loops, conditions, and math.',
+    role: 'Builds the logical outline of the program.',
+    traditionalDetail: 'Builds the standard program outline.',
+    aiDetail: 'Uses the exact same verified program outline.',
   },
   'semantic': {
     id: 'semantic',
-    name: '3. Semantic Analysis (Type Checker)',
+    name: '3. Semantic Analysis',
     phaseNumber: 3,
     category: 'Type Safety',
-    summary: 'Checks types and meaning (for instance, ensuring you do not multiply text by numbers).',
-    role: 'Decorates tree with types and binds variables in the Symbol Table.',
-    traditionalDetail: 'Clang Sema checks type legality.',
-    aiDetail: 'Guarantees program type safety.',
+    summary: 'Makes sure operations make sense (for example, ensuring you do not try to multiply text by a number).',
+    role: 'Verifies data types and links every variable to the Variable Table.',
+    traditionalDetail: 'Confirms every variable and type is valid.',
+    aiDetail: 'Guarantees the program is safe before optimizing.',
   },
   'intermediate': {
     id: 'intermediate',
     name: '4. Intermediate Code Generation',
     phaseNumber: 4,
     category: 'Universal Blueprint',
-    summary: 'Translates the code tree into a clean, hardware-independent universal blueprint (LLVM IR).',
-    role: 'Exposes loop structures and registers for optimization.',
-    traditionalDetail: 'Standard unoptimized LLVM IR.',
-    aiDetail: 'Clean SSA blueprint for Gemini AI to inspect.',
+    summary: 'Turns the code into a clean, step-by-step internal blueprint that works on any type of computer.',
+    role: 'Exposes loops and repeated math so they can be sped up.',
+    traditionalDetail: 'Creates the starting blueprint.',
+    aiDetail: 'Creates a clean blueprint for the AI to inspect.',
   },
   'opt-traditional': {
     id: 'opt-traditional',
-    name: '5A. Traditional Optimization (-O2)',
+    name: '5A. Code Optimization (-O2)',
     phaseNumber: '5A',
-    category: 'Blind 120+ Passes',
-    summary: 'Runs a rigid, fixed list of ~120 optimization rules blindly whether the code needs them or not.',
-    role: 'Applies standard generic heuristics.',
-    traditionalDetail: 'Executes ~120 passes unconditionally, wasting compilation cycles.',
+    category: 'Blind 120+ Checks',
+    summary: 'Runs a rigid, fixed checklist of ~120 cleanup rules blindly whether the code needs them or not.',
+    role: 'Applies every general-purpose rule in sequence.',
+    traditionalDetail: 'Runs ~120 checks every time, wasting time on rules that find nothing.',
     aiDetail: 'Baseline reference for speed comparison.',
   },
   'opt-ai': {
     id: 'opt-ai',
-    name: '5B. AI-Assisted Optimization',
+    name: '5B. Code Optimization (AI-Guided)',
     phaseNumber: '5B',
     category: 'Smart AI Selection',
-    summary: 'Gemini AI spots the nested math loops and picks only the 7 exact rules that speed up this program.',
-    role: 'Bypasses 113 useless passes; applies targeted vectorization.',
-    traditionalDetail: 'Replaces rigid heuristics with AI reasoning.',
-    aiDetail: 'Cuts compile time and accelerates execution latency.',
+    summary: 'AI spots the slow parts (like nested math loops) and picks only the 7 exact speedup tools this program needs.',
+    role: 'Skips ~113 useless checks and focuses directly on the real bottlenecks.',
+    traditionalDetail: 'Replaces blind checklists with targeted diagnosis.',
+    aiDetail: 'Cuts optimization time while keeping the app running at top speed.',
   },
   'codegen': {
     id: 'codegen',
     name: '6. Target Code Generation',
     phaseNumber: 6,
-    category: 'CPU Assembly',
-    summary: 'Translates the optimized blueprint into real machine instructions for your CPU (x86_64).',
-    role: 'Assigns CPU registers and generates native assembly.',
-    traditionalDetail: 'Standard instruction lowering.',
-    aiDetail: 'Lower register pressure leads to fewer memory spills.',
+    category: 'Machine Translation',
+    summary: 'Translates the finished blueprint into direct instructions that your computer processor can run.',
+    role: 'Maps data to fast processor slots and generates machine code.',
+    traditionalDetail: 'Standard translation to processor instructions.',
+    aiDetail: 'Cleaner blueprint makes final translation smoother.',
   },
   'machine': {
     id: 'machine',
-    name: 'Machine Language Code Output',
+    name: 'Final Runnable Program',
     phaseNumber: 'Output',
     category: 'Runnable App',
-    summary: 'The final runnable executable app file ready for nanosecond benchmarking.',
-    role: 'Executes iterations and records speed and output verification.',
-    traditionalDetail: 'Baseline binary.',
-    aiDetail: 'AI-accelerated executable.',
+    summary: 'The finished program ready to run and time side by side.',
+    role: 'Runs multiple times to measure speed and confirm identical output.',
+    traditionalDetail: 'Standard compiled program.',
+    aiDetail: 'AI-optimized program.',
   },
   'symbol-table': {
     id: 'symbol-table',
-    name: 'Symbol Table Manager',
+    name: 'Variable Table',
     phaseNumber: 'Lookup',
     category: 'Central Phonebook',
-    summary: 'The central catalog tracking every variable name, memory spot, and data type across all compiler phases.',
-    role: 'Connected to all 6 phases for variable lookups.',
-    traditionalDetail: 'Clang IdentifierTable & Scope.',
-    aiDetail: 'Provides variable binding information.',
+    summary: 'A central lookup table tracking every variable name, memory location, and data type across all steps.',
+    role: 'Connected to all 6 steps for instant variable lookups.',
+    traditionalDetail: 'Tracks every variable name and scope.',
+    aiDetail: 'Helps confirm variable usage stays accurate.',
   },
   'error-handling': {
     id: 'error-handling',
-    name: 'Error Handling & Safety',
+    name: 'Error Checker & Safety',
     phaseNumber: 'Guard',
-    category: 'Diagnostic Sentinel',
-    summary: 'Monitors all compiler phases to catch syntax mistakes, type conflicts, and bad code safely.',
-    role: 'Reports errors and stops bad code from running.',
-    traditionalDetail: 'Clang DiagnosticsEngine.',
-    aiDetail: 'Validates AI pass safety.',
+    category: 'Safety Guard',
+    summary: 'Watches every step to catch typos, grammar mistakes, and unsafe code before anything runs.',
+    role: 'Reports clear errors and stops broken code from running.',
+    traditionalDetail: 'Stops compilation if syntax errors are found.',
+    aiDetail: 'Verifies that every AI-selected tool is safe to apply.',
   },
 };
 
@@ -161,7 +161,7 @@ export const ThreePipelineDiagram: React.FC<ThreePipelineDiagramProps> = ({
   onRunBenchmark,
   programName = 'Matrix Multiplication O(N³)',
   onOpenStudio,
-  heightClass = 'h-[720px]',
+  heightClass = 'h-[500px] sm:h-[720px]',
 }) => {
   const mountRef = useRef<HTMLDivElement>(null);
   const sceneRef = useRef<THREE.Scene | null>(null);
@@ -704,77 +704,78 @@ export const ThreePipelineDiagram: React.FC<ThreePipelineDiagramProps> = ({
       {/* 3D WebGL Canvas */}
       <div ref={mountRef} className="w-full h-full relative cursor-grab active:cursor-grabbing" />
 
-      {/* Top Left Floating Pill: Title & Context */}
-      <div className="absolute top-4 left-4 z-20 pointer-events-none flex items-center space-x-3">
-        <div className="px-4 py-2.5 rounded-2xl apple-glass-pill pointer-events-auto shadow-sm text-xs space-y-0.5 max-w-md">
-          <div className="flex items-center space-x-2">
-            <span className="w-2 h-2 rounded-full bg-black dark:bg-white animate-pulse" />
+      {/* Top Floating HUD: Responsive container prevents overlap on mobile */}
+      <div className="absolute top-3 left-3 right-3 z-20 pointer-events-none flex flex-col sm:flex-row sm:items-start justify-between gap-2">
+        {/* Top Left Floating Pill: Title & Context */}
+        <div className="px-3 sm:px-4 py-2 sm:py-2.5 rounded-2xl apple-glass-pill pointer-events-auto shadow-sm text-xs space-y-0.5 max-w-md">
+          <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
+            <span className="w-2 h-2 rounded-full bg-black dark:bg-white animate-pulse shrink-0" />
             <span className="font-semibold tracking-tight text-black dark:text-white text-xs">
-              Live 3D Compiler Architecture
+              Live 3D Compiler Flow
             </span>
             <span className="text-zinc-400">•</span>
-            <span className="font-mono text-[10px] text-zinc-500 dark:text-zinc-400">
+            <span className="font-mono text-[10px] text-zinc-600 dark:text-zinc-400 truncate max-w-[160px] sm:max-w-none">
               {programName}
             </span>
           </div>
-          <p className="text-[11px] text-zinc-500 dark:text-zinc-400 leading-snug">
-            Interactive spatial model of the 6 canonical compiler construction phases with Symbol Table & Error Handling.
+          <p className="text-[11px] text-zinc-600 dark:text-zinc-400 leading-snug hidden sm:block">
+            Interactive 3D view of how code turns into a runnable program, with Variable Lookup and Error Checking.
           </p>
+        </div>
+
+        {/* Top Right Action Pill: Camera presets & Compare button */}
+        <div className="flex flex-wrap items-center gap-2 pointer-events-auto">
+          {onRunBenchmark && (
+            <button
+              onClick={onRunBenchmark}
+              disabled={isRunning}
+              className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl font-bold text-xs shadow-md transition-all cursor-pointer flex items-center space-x-1.5 ${
+                isRunning
+                  ? 'opacity-60 cursor-not-allowed bg-zinc-400 text-white'
+                  : 'bg-black dark:bg-white text-white dark:text-black hover:opacity-90 active:scale-95'
+              }`}
+            >
+              <Play className="w-3 h-3 fill-current" />
+              <span>Run Comparison</span>
+            </button>
+          )}
+
+          {/* View presets */}
+          <div className="flex items-center p-1 rounded-xl apple-glass-pill text-xs">
+            <button
+              onClick={() => handleViewPreset('overview')}
+              className="px-2 sm:px-2.5 py-1 rounded-lg text-zinc-500 hover:text-black dark:hover:text-white text-[10px] sm:text-[11px] font-medium cursor-pointer"
+            >
+              Overview
+            </button>
+            <button
+              onClick={() => handleViewPreset('opt-fork')}
+              className="px-2 sm:px-2.5 py-1 rounded-lg text-zinc-500 hover:text-black dark:hover:text-white text-[10px] sm:text-[11px] font-medium cursor-pointer"
+            >
+              Opt Fork
+            </button>
+            <button
+              onClick={() => handleViewPreset('top')}
+              className="px-2 sm:px-2.5 py-1 rounded-lg text-zinc-500 hover:text-black dark:hover:text-white text-[10px] sm:text-[11px] font-medium cursor-pointer"
+            >
+              Top-Down
+            </button>
+          </div>
         </div>
       </div>
 
       {/* Live Benchmark Execution Notification */}
       {isRunning && (
-        <div className="absolute top-4 left-1/2 -translate-x-1/2 z-30 flex items-center space-x-2.5 px-4 py-2 rounded-full apple-glass shadow-lg animate-pulse text-xs font-mono">
-          <div className="w-2 h-2 rounded-full bg-black dark:bg-white animate-ping" />
-          <span className="font-semibold text-black dark:text-white">
+        <div className="absolute top-28 sm:top-16 left-1/2 -translate-x-1/2 z-30 w-[90%] sm:w-auto flex items-center justify-center space-x-2.5 px-4 py-2 rounded-full apple-glass shadow-lg animate-pulse text-xs font-mono">
+          <div className="w-2 h-2 rounded-full bg-black dark:bg-white animate-ping shrink-0" />
+          <span className="font-semibold text-black dark:text-white truncate">
             {benchmarkStep || 'Simultaneously compiling through both optimization branches...'}
           </span>
         </div>
       )}
 
-      {/* Top Right Action Pill: Camera presets & Compare button */}
-      <div className="absolute top-4 right-4 z-20 flex items-center space-x-2">
-        {onRunBenchmark && (
-          <button
-            onClick={onRunBenchmark}
-            disabled={isRunning}
-            className={`px-4 py-2 rounded-xl font-bold text-xs shadow-md transition-all cursor-pointer flex items-center space-x-1.5 ${
-              isRunning
-                ? 'opacity-60 cursor-not-allowed bg-zinc-400 text-white'
-                : 'bg-black dark:bg-white text-white dark:text-black hover:opacity-90 active:scale-95'
-            }`}
-          >
-            <Play className="w-3 h-3 fill-current" />
-            <span>Run Comparison</span>
-          </button>
-        )}
-
-        {/* View presets */}
-        <div className="flex items-center p-1 rounded-xl apple-glass-pill text-xs">
-          <button
-            onClick={() => handleViewPreset('overview')}
-            className="px-2.5 py-1 rounded-lg text-zinc-500 hover:text-black dark:hover:text-white text-[11px] font-medium cursor-pointer"
-          >
-            Overview
-          </button>
-          <button
-            onClick={() => handleViewPreset('opt-fork')}
-            className="px-2.5 py-1 rounded-lg text-zinc-500 hover:text-black dark:hover:text-white text-[11px] font-medium cursor-pointer"
-          >
-            Optimization Fork
-          </button>
-          <button
-            onClick={() => handleViewPreset('top')}
-            className="px-2.5 py-1 rounded-lg text-zinc-500 hover:text-black dark:hover:text-white text-[11px] font-medium cursor-pointer"
-          >
-            Top-Down
-          </button>
-        </div>
-      </div>
-
       {/* Bottom Floating Clean Playback Bar (Non-obstructive) */}
-      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 flex items-center space-x-3 px-4 py-2 rounded-2xl apple-glass shadow-lg text-xs font-mono">
+      <div className="absolute bottom-3 sm:bottom-4 left-1/2 -translate-x-1/2 z-20 w-[92%] sm:w-auto flex flex-wrap items-center justify-center gap-x-2.5 sm:gap-x-3 gap-y-1.5 px-3 sm:px-4 py-2 rounded-2xl apple-glass shadow-lg text-xs font-mono">
         <button
           onClick={() => setIsPlaying(!isPlaying)}
           className="flex items-center space-x-1.5 px-2.5 py-1 rounded-xl bg-black dark:bg-white text-white dark:text-black font-semibold hover:opacity-90 transition-opacity cursor-pointer shadow-sm text-[11px]"
@@ -783,7 +784,7 @@ export const ThreePipelineDiagram: React.FC<ThreePipelineDiagramProps> = ({
           <span>{isPlaying ? 'Pause' : 'Resume'}</span>
         </button>
 
-        <span className="text-zinc-300 dark:text-zinc-700">|</span>
+        <span className="text-zinc-300 dark:text-zinc-700 hidden sm:inline">|</span>
 
         <div className="flex items-center space-x-1 text-zinc-500">
           <span>Speed:</span>
@@ -802,7 +803,7 @@ export const ThreePipelineDiagram: React.FC<ThreePipelineDiagramProps> = ({
           ))}
         </div>
 
-        <span className="text-zinc-300 dark:text-zinc-700">|</span>
+        <span className="text-zinc-300 dark:text-zinc-700 hidden sm:inline">|</span>
 
         <button
           onClick={handleResetCamera}
@@ -810,12 +811,12 @@ export const ThreePipelineDiagram: React.FC<ThreePipelineDiagramProps> = ({
           title="Reset Camera View"
         >
           <RotateCcw className="w-3 h-3" />
-          <span>Reset Camera</span>
+          <span>Reset</span>
         </button>
 
-        <span className="text-zinc-300 dark:text-zinc-700">|</span>
+        <span className="text-zinc-300 dark:text-zinc-700 hidden sm:inline">|</span>
 
-        <span className="text-[11px] text-zinc-400 font-sans hidden sm:inline">
+        <span className="text-[11px] text-zinc-400 font-sans hidden md:inline">
           Click any 3D node to inspect details
         </span>
       </div>
@@ -852,11 +853,11 @@ export const ThreePipelineDiagram: React.FC<ThreePipelineDiagramProps> = ({
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px]">
             <div className="p-2 rounded-xl bg-black/[0.02] dark:bg-white/[0.03] border border-black/[0.04] dark:border-white/[0.05]">
-              <span className="text-[10px] uppercase font-mono font-bold text-zinc-500 block mb-0.5">Traditional Pipeline</span>
+              <span className="text-[10px] uppercase font-mono font-bold text-zinc-600 dark:text-zinc-400 block mb-0.5">Standard Compiler</span>
               <span className="text-zinc-800 dark:text-zinc-200">{activeStage.traditionalDetail}</span>
             </div>
             <div className="p-2 rounded-xl bg-black/[0.02] dark:bg-white/[0.03] border border-black/[0.04] dark:border-white/[0.05]">
-              <span className="text-[10px] uppercase font-mono font-bold text-zinc-500 block mb-0.5">AI-Assisted Approach</span>
+              <span className="text-[10px] uppercase font-mono font-bold text-zinc-600 dark:text-zinc-400 block mb-0.5">AI-Assisted Approach</span>
               <span className="text-zinc-800 dark:text-zinc-200">{activeStage.aiDetail}</span>
             </div>
           </div>

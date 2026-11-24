@@ -4,8 +4,8 @@ export const CODE_SAMPLES: CodeSample[] = [
   {
     id: 'matrix-mult',
     title: 'Matrix Multiplication (128x128)',
-    category: 'Linear Algebra / Memory Tiling',
-    description: 'Triple-nested matrix product. Tests auto-vectorization, loop interchange, and memory hierarchy register allocation.',
+    category: 'Grid Math & Loops',
+    description: 'Multiplies two 128x128 number grids inside three nested loops. Great for testing how well a compiler speeds up repetitive math and memory lookups.',
     language: 'c',
     targetOptimization: 'loop-vectorize, loop-unroll, licm',
     code: `#include <stdio.h>
@@ -54,8 +54,8 @@ int main() {
   {
     id: 'n-body',
     title: 'N-Body Particle Interaction',
-    category: 'Scientific Computing / Physics',
-    description: 'Simulates gravitational attraction between particles. Heavy floating-point arithmetic with square root computations.',
+    category: 'Physics Simulation',
+    description: 'Simulates gravity pulling 64 objects together across 1,500 steps. Tests heavy decimal math and repeated square-root calculations.',
     language: 'c',
     targetOptimization: 'instcombine, loop-unroll, early-cse, slp-vectorizer',
     code: `#include <stdio.h>
@@ -122,8 +122,8 @@ int main() {
   {
     id: 'sieve-primes',
     title: 'Sieve of Eratosthenes (1M)',
-    category: 'Number Theory / Bit Arrays',
-    description: 'Finds prime numbers up to 1,000,000 using sequential sieve. Tests stride-access patterns, loop termination, and branch reduction.',
+    category: 'Number Finding',
+    description: 'Finds all prime numbers up to 800,000 by crossing off multiples in a large list. Tests fast memory scanning and simple loop shortcuts.',
     language: 'c',
     targetOptimization: 'loop-rotate, licm, indvars, simplifycfg',
     code: `#include <stdio.h>
@@ -164,8 +164,8 @@ int main() {
   {
     id: 'fast-fourier',
     title: 'Radix-2 FFT Butterfly Operations',
-    category: 'Signal Processing / Math',
-    description: 'Computes Discrete Fourier Transform via bit-reversal and complex butterflies. Tests common subexpression elimination and trig factoring.',
+    category: 'Audio & Signal Processing',
+    description: 'Breaks a sound wave down into its individual frequencies. Tests how well a compiler spots and reuses repeated math inside loops.',
     language: 'c',
     targetOptimization: 'gvn, reassociate, instcombine, loop-unroll',
     code: `#include <stdio.h>
@@ -237,8 +237,8 @@ int main() {
   {
     id: 'quicksort-partition',
     title: 'Quicksort & In-Place Partitioning',
-    category: 'Algorithms / Recursion',
-    description: 'Sorts large pseudo-random arrays. Tests recursive call tail optimization, branch predictability, and register spills.',
+    category: 'Sorting & Lists',
+    description: 'Sorts 40,000 scrambled numbers in order. Tests how well a compiler simplifies repeated function calls and fast comparisons.',
     language: 'c',
     targetOptimization: 'tailcallelim, inline, jump-threading, sroa',
     code: `#include <stdio.h>
@@ -302,8 +302,8 @@ int main() {
   {
     id: 'dead-code-folding',
     title: 'Dead Code & Constant Folding Stress',
-    category: 'Compiler Analysis / DCE',
-    description: 'Designed to challenge Dead Code Elimination and Constant Folding passes. Contains heavy dead control paths and algebraic identities.',
+    category: 'Cleanup & Unused Code',
+    description: 'Packed with pointless loops, impossible if-checks, and math that cancels itself out. Tests how quickly a compiler spots and deletes wasted work.',
     language: 'c',
     targetOptimization: 'dce, adce, sccp, constmerge, simplifycfg',
     code: `#include <stdio.h>

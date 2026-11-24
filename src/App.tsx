@@ -29,22 +29,11 @@ import {
 } from 'lucide-react';
 
 export default function App() {
-  // Theme state: Apple Dark Mode by default, persistent in localStorage
-  const [isDark, setIsDark] = useState<boolean>(() => {
-    const saved = localStorage.getItem('compiler_lab_theme');
-    if (saved) return saved === 'dark';
-    return true;
-  });
-
+  // Permanently enforce Dark Mode
   useEffect(() => {
-    if (isDark) {
-      document.documentElement.classList.add('dark');
-      localStorage.setItem('compiler_lab_theme', 'dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-      localStorage.setItem('compiler_lab_theme', 'light');
-    }
-  }, [isDark]);
+    document.documentElement.classList.add('dark');
+    localStorage.setItem('compiler_lab_theme', 'dark');
+  }, []);
 
   // Active navigation tab — default to the Dual Compilers Lab hero view!
   const [activeTab, setActiveTab] = useState<ActiveTab>('lab');
@@ -132,23 +121,23 @@ export default function App() {
 
     setIsRunning(true);
     setErrorMessage(null);
-    setBenchmarkStep('Validating source & AST...');
+    setBenchmarkStep('Reading code and checking grammar...');
 
     try {
       setTimeout(() => {
-        if (isRunning) setBenchmarkStep('Extracting unoptimized LLVM IR...');
+        if (isRunning) setBenchmarkStep('Building universal code blueprint...');
       }, 300);
 
       setTimeout(() => {
-        if (isRunning) setBenchmarkStep('Gemini 3.8 Flash analyzing IR structures...');
+        if (isRunning) setBenchmarkStep('AI scanning for slow loops and repeated math...');
       }, 900);
 
       setTimeout(() => {
-        if (isRunning) setBenchmarkStep('Applying LLVM opt transformation pipeline...');
+        if (isRunning) setBenchmarkStep('Applying targeted AI speedups...');
       }, 2200);
 
       setTimeout(() => {
-        if (isRunning) setBenchmarkStep('Executing nanosecond benchmark & hash verify...');
+        if (isRunning) setBenchmarkStep('Measuring run speed and verifying output...');
       }, 3200);
 
       const payload = {
@@ -207,7 +196,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col font-sans transition-colors duration-300 relative selection:bg-black/10 dark:selection:bg-white/20 bg-[#F5F5F7] dark:bg-black text-[#1D1D1F] dark:text-[#F5F5F7]">
+    <div className="min-h-screen flex flex-col font-sans transition-colors duration-300 relative overflow-x-hidden selection:bg-black/10 dark:selection:bg-white/20 bg-[#F3F4F6] dark:bg-black text-zinc-950 dark:text-[#F5F5F7]">
       {/* Subtle Apple ambient background glows */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
         <div className="absolute -top-40 left-1/2 -translate-x-1/2 w-[800px] h-[500px] bg-black/[0.02] dark:bg-white/[0.03] rounded-full blur-3xl" />
@@ -218,14 +207,12 @@ export default function App() {
       <Navbar
         activeTab={activeTab}
         setActiveTab={setActiveTab}
-        isDark={isDark}
-        setIsDark={setIsDark}
         systemStatus={systemStatus}
         onOpenSettings={() => setIsSettingsOpen(true)}
       />
 
       {/* Main View Area */}
-      <main className="relative z-10 flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-5">
+      <main className="relative z-10 flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-5">
         {/* TAB 0: HERO LAB — PROBLEM, SOLUTION & DUAL COMPILERS SIDE-BY-SIDE */}
         {activeTab === 'lab' && (
           <DualCompilerLabView
@@ -255,14 +242,14 @@ export default function App() {
             {/* Header info */}
             <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 border-b border-black/[0.06] dark:border-white/[0.08] pb-3">
               <div>
-                <span className="text-xs uppercase font-mono tracking-wider font-semibold text-zinc-500 dark:text-zinc-400">
-                  Interactive Spatial Diagram
+                <span className="text-xs uppercase font-mono tracking-wider font-semibold text-zinc-600 dark:text-zinc-400">
+                  Interactive 3D Diagram
                 </span>
                 <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#1D1D1F] dark:text-[#F5F5F7]">
-                  Live 3D Optimization Pipeline
+                  Live 3D Optimization Flow
                 </h1>
-                <p className="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400 mt-0.5">
-                  Real-time physical conveyor simulation of Clang frontend lowering and LLVM pass optimization.
+                <p className="text-xs sm:text-sm text-zinc-600 dark:text-zinc-400 mt-0.5">
+                  Watch how your code travels through a standard compiler versus an AI-guided compiler in real time.
                 </p>
               </div>
 
@@ -293,43 +280,43 @@ export default function App() {
 
             {/* The Live Visual 3D Pipeline Diagram Canvas */}
             <ThreePipelineDiagram
-              isDark={isDark}
+              isDark={true}
               isRunning={isRunning}
               benchmarkStep={benchmarkStep}
               currentResult={currentResult}
               onRunBenchmark={handleRunBenchmark}
               programName={programName}
               onOpenStudio={() => setActiveTab('workspace')}
-              heightClass="h-[740px]"
+              heightClass="h-[520px] sm:h-[740px]"
             />
 
             {/* Micro Feature Explanations */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
               <div className="p-4 rounded-2xl apple-glass space-y-1">
                 <span className="font-mono font-semibold text-[#1D1D1F] dark:text-[#F5F5F7] text-[11px] block">
-                  Conveyor A: Traditional LLVM (-O2)
+                  Track A: Standard Compiler (-O2)
                 </span>
-                <p className="text-zinc-500 dark:text-zinc-400 text-[11px] leading-relaxed">
-                  Fixed static heuristics (~120 passes). Runs invariant sequence regardless of algorithm structure, leading to phase conflicts.
+                <p className="text-zinc-600 dark:text-zinc-400 text-[11px] leading-relaxed">
+                  Runs a fixed checklist of ~120 cleanup steps in the same order for every program, even when most steps are unnecessary.
                 </p>
               </div>
 
               <div className="p-4 rounded-2xl apple-glass space-y-1">
                 <span className="font-mono font-semibold text-[#1D1D1F] dark:text-[#F5F5F7] text-[11px] block flex items-center">
                   <Sparkles className="w-3 h-3 mr-1" />
-                  Conveyor B: LLM Cognitive Core
+                  Track B: AI-Guided Compiler
                 </span>
-                <p className="text-zinc-500 dark:text-zinc-400 text-[11px] leading-relaxed">
-                  Analyzes unoptimized IR SSA registers and loop trip counts, synthesizing an adaptive, minimal pass order.
+                <p className="text-zinc-600 dark:text-zinc-400 text-[11px] leading-relaxed">
+                  Inspects the program structure first, then picks only the handful of speedup steps that actually make this code faster.
                 </p>
               </div>
 
               <div className="p-4 rounded-2xl apple-glass space-y-1">
                 <span className="font-mono font-semibold text-[#1D1D1F] dark:text-[#F5F5F7] text-[11px] block">
-                  Live Spatial Raycasting
+                  Click Any Stage to Explore
                 </span>
-                <p className="text-zinc-500 dark:text-zinc-400 text-[11px] leading-relaxed">
-                  Click any 3D node or instruction packet to view technical inputs, outputs, and compiler phase ordering implications.
+                <p className="text-zinc-600 dark:text-zinc-400 text-[11px] leading-relaxed">
+                  Click any 3D block in the diagram to see what happens at that step and how the standard and AI approaches differ.
                 </p>
               </div>
             </div>
@@ -397,13 +384,13 @@ export default function App() {
                   </button>
                 </div>
                 <ThreePipelineDiagram
-                  isDark={isDark}
+                  isDark={true}
                   isRunning={isRunning}
                   benchmarkStep={benchmarkStep}
                   currentResult={currentResult}
                   onRunBenchmark={handleRunBenchmark}
                   programName={programName}
-                  heightClass="h-[480px]"
+                  heightClass="h-[420px] sm:h-[480px]"
                 />
               </div>
             )}
@@ -436,7 +423,7 @@ export default function App() {
               <div className="p-4 rounded-2xl bg-zinc-800 text-zinc-200 border border-zinc-700 text-xs flex items-start space-x-3 shadow-sm">
                 <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-zinc-400" />
                 <div className="flex-1 space-y-1">
-                  <span className="font-semibold block text-white">Pipeline Execution Error</span>
+                  <span className="font-semibold block text-white">Test Run Error</span>
                   <pre className="font-mono text-[11px] whitespace-pre-wrap text-zinc-300">{errorMessage}</pre>
                 </div>
               </div>
@@ -448,8 +435,8 @@ export default function App() {
                 <h2 className="text-sm font-semibold tracking-tight text-[#1D1D1F] dark:text-[#F5F5F7]">
                   Compiler Optimization Comparison
                 </h2>
-                <span className="text-[11px] text-zinc-400">
-                  Differential compilation results over {iterations} sample iterations
+                <span className="text-[11px] text-zinc-600 dark:text-zinc-400">
+                  Side-by-side speed test averaged over {iterations} runs
                 </span>
               </div>
 
@@ -457,10 +444,10 @@ export default function App() {
                 {/* COMPILER A: Traditional Clang / LLVM */}
                 <CompilerCard
                   type="traditional"
-                  title="Traditional Compiler"
-                  subtitle="Standard LLVM Heuristics"
+                  title="Standard Compiler"
+                  subtitle="Runs 120+ fixed checks"
                   badge="BASELINE"
-                  presetOrModel={`Clang ${baselinePreset}`}
+                  presetOrModel={`Standard ${baselinePreset}`}
                   status={
                     isRunning
                       ? 'running'
@@ -474,13 +461,13 @@ export default function App() {
                   onNavigateTo3D={() => setActiveTab('3d-pipeline')}
                 />
 
-                {/* COMPILER B: LLM-Assisted Compiler */}
+                {/* COMPILER B: AI-Assisted Compiler */}
                 <CompilerCard
                   type="llm"
-                  title="LLM-Assisted Compiler"
-                  subtitle="AI-Guided LLVM Optimization"
-                  badge={isManualPassMode ? 'CUSTOM PASSES' : 'AI OPTIMIZED'}
-                  presetOrModel={isManualPassMode ? `${manualPasses.length} LLVM Passes` : 'Gemini 3.8 Flash + opt'}
+                  title="AI-Assisted Compiler"
+                  subtitle="Picks only the checks that help"
+                  badge={isManualPassMode ? 'MANUAL TOOLS' : 'AI OPTIMIZED'}
+                  presetOrModel={isManualPassMode ? `${manualPasses.length} Selected Tools` : 'Smart AI Selection'}
                   status={
                     isRunning
                       ? 'running'
@@ -601,10 +588,10 @@ export default function App() {
       </main>
 
       {/* Floating Apple Glass Footer */}
-      <footer className="relative z-10 border-t border-black/[0.04] dark:border-white/[0.05] py-4 text-center text-xs font-mono text-zinc-500 dark:text-zinc-400">
+      <footer className="relative z-10 border-t border-black/[0.06] dark:border-white/[0.05] py-4 text-center text-xs font-mono text-zinc-600 dark:text-zinc-400">
         <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
-          <span>Compiler Optimization Lab • Apple Silicon & LLVM Architecture</span>
-          <span>Clang 14.0.6 • Gemini 3.8 Flash • Differential Output Hashing</span>
+          <span>Compiler Optimization Lab • Standard vs. AI Code Speedup</span>
+          <span>Side-by-Side Speed Testing • Automatic Output Verification</span>
         </div>
       </footer>
 
